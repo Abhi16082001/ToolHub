@@ -1,0 +1,144 @@
+---
+import ToolLayout from '../../layouts/ToolLayout.astro';
+import { getToolBySlug, getRelatedTools } from '../../data/tools';
+
+const tool = getToolBySlug('converter-tools', 'temperature-converter')!;
+const relatedTools = getRelatedTools(tool, 4);
+
+const faqs = [
+  { question: 'How do I convert Celsius to Fahrenheit?', answer: 'Multiply by 9/5 and add 32. Formula: °F = (°C × 9/5) + 32. Example: 100°C = 212°F.' },
+  { question: 'How do I convert Fahrenheit to Celsius?', answer: 'Subtract 32 and multiply by 5/9. Formula: °C = (°F - 32) × 5/9. Example: 98.6°F = 37°C.' },
+  { question: 'What is absolute zero in Celsius?', answer: 'Absolute zero is -273.15°C, which equals 0 Kelvin or -459.67°F.' },
+];
+
+const units = [
+  { id: 'celsius', label: 'Celsius', symbol: '°C' },
+  { id: 'fahrenheit', label: 'Fahrenheit', symbol: '°F' },
+  { id: 'kelvin', label: 'Kelvin', symbol: 'K' },
+  { id: 'rankine', label: 'Rankine', symbol: '°R' },
+];
+---
+
+<ToolLayout
+  tool={tool}
+  title="Temperature Converter"
+  description="Convert between Celsius, Fahrenheit, Kelvin and Rankine instantly. Free online temperature converter — works entirely in your browser."
+  faqs={faqs}
+  relatedTools={relatedTools}
+>
+  <div slot="tool" class="space-y-4 max-w-lg">
+    <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+      {units.map(unit => (
+        <div class="rounded-lg border p-4" style="background-color: var(--color-canvas); border-color: var(--color-hairline);">
+          <label for={`temp-${unit.id}`} class="block text-caption-mono mb-2" style="color: var(--color-mute);">{unit.label} ({unit.symbol})</label>
+          <input
+            id={`temp-${unit.id}`}
+            type="number"
+            step="any"
+            placeholder="0"
+            data-unit={unit.id}
+            class="temp-input w-full rounded-md border px-3 h-10 text-sm font-mono focus:outline-none focus:ring-2 focus:ring-[var(--color-link)] focus:border-transparent"
+            style="background-color: var(--color-canvas-soft-2); border-color: var(--color-hairline); color: var(--color-ink);"
+          />
+        </div>
+      ))}
+    </div>
+
+    <button id="btn-reset-temp" type="button" class="rounded-full border px-4 h-9 text-sm font-medium" style="border-color: var(--color-hairline); color: var(--color-body-text); background-color: var(--color-canvas);">Reset</button>
+
+    <!-- Common reference table -->
+    <div class="rounded-lg border overflow-hidden" style="border-color: var(--color-hairline);">
+      <div class="px-4 py-2 text-caption-mono" style="background-color: var(--color-canvas-soft-2); color: var(--color-mute);">Common References</div>
+      <table class="w-full text-sm">
+        <thead>
+          <tr style="border-bottom: 1px solid var(--color-hairline);">
+            <th class="px-4 py-2 text-left font-medium" style="color: var(--color-body-text);">Description</th>
+            <th class="px-4 py-2 text-right font-medium" style="color: var(--color-body-text);">°C</th>
+            <th class="px-4 py-2 text-right font-medium" style="color: var(--color-body-text);">°F</th>
+          </tr>
+        </thead>
+        <tbody>
+          {[
+            { desc: 'Absolute Zero', c: -273.15, f: -459.67 },
+            { desc: 'Water Freezes', c: 0, f: 32 },
+            { desc: 'Body Temperature', c: 37, f: 98.6 },
+            { desc: 'Water Boils', c: 100, f: 212 },
+          ].map(row => (
+            <tr style="border-bottom: 1px solid var(--color-hairline);">
+              <td class="px-4 py-2" style="color: var(--color-body-text);">{row.desc}</td>
+              <td class="px-4 py-2 text-right font-mono" style="color: var(--color-ink);">{row.c}</td>
+              <td class="px-4 py-2 text-right font-mono" style="color: var(--color-ink);">{row.f}</td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <div slot="content">
+    <section aria-labelledby="how-to-use">
+      <h2 id="how-to-use" class="text-display-sm mb-3" style="color: var(--color-ink);">How to use</h2>
+      <ol class="space-y-2 text-sm leading-relaxed" style="color: var(--color-body-text);">
+        <li>1. Enter a temperature value in any field.</li>
+        <li>2. All other units update instantly.</li>
+        <li>3. Click Reset to clear all values.</li>
+      </ol>
+    </section>
+  </div>
+</ToolLayout>
+
+<script>
+  const inputs = document.querySelectorAll('.temp-input') as NodeListOf<HTMLInputElement>;
+  const btnReset = document.getElementById('btn-reset-temp')!;
+
+  function toCelsius(value: number, unit: string): number {
+    switch (unit) {
+      case 'celsius': return value;
+      case 'fahrenheit': return (value - 32) * 5 / 9;
+      case 'kelvin': return value - 273.15;
+      case 'rankine': return (value - 491.67) * 5 / 9;
+      default: return value;
+    }
+  }
+
+  function fromCelsius(celsius: number, unit: string): number {
+    switch (unit) {
+      case 'celsius': return celsius;
+      case 'fahrenheit': return celsius * 9 / 5 + 32;
+      case 'kelvin': return celsius + 273.15;
+      case 'rankine': return (celsius + 273.15) * 9 / 5;
+      default: return celsius;
+    }
+  }
+
+  function fmt(n: number): string {
+    return parseFloat(n.toFixed(6)).toString();
+  }
+
+  inputs.forEach(input => {
+    input.addEventListener('input', () => {
+      const value = parseFloat(input.value);
+      const unit = input.dataset.unit!;
+      if (isNaN(value)) { inputs.forEach(i => { if (i !== input) i.value = ''; }); return; }
+      const celsius = toCelsius(value, unit);
+      inputs.forEach(i => {
+        if (i !== input) i.value = fmt(fromCelsius(celsius, i.dataset.unit!));
+      });
+    });
+  });
+
+  btnReset.addEventListener('click', () => {
+    inputs.forEach(i => { i.value = ''; });
+  });
+</script>
+
+<style>
+  html.dark div[style*="var(--color-canvas)"][style*="border"] { background-color: var(--color-dark-canvas-soft) !important; border-color: var(--color-dark-hairline) !important; }
+  html.dark input[type="number"] { background-color: var(--color-dark-canvas-soft-2) !important; border-color: var(--color-dark-hairline) !important; color: var(--color-dark-ink) !important; }
+  html.dark button { background-color: var(--color-dark-canvas-soft) !important; border-color: var(--color-dark-hairline) !important; color: var(--color-dark-body) !important; }
+  html.dark div[style*="var(--color-canvas-soft-2)"] { background-color: var(--color-dark-canvas-soft-2) !important; }
+  html.dark table { border-color: var(--color-dark-hairline) !important; }
+  html.dark th, html.dark td { color: var(--color-dark-body) !important; border-color: var(--color-dark-hairline) !important; }
+  html.dark td[style*="var(--color-ink)"] { color: var(--color-dark-ink) !important; }
+  html.dark label { color: var(--color-dark-mute) !important; }
+</style>

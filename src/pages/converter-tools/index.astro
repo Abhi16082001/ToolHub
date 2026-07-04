@@ -1,0 +1,11 @@
+---
+import CategoryLayout from '../../layouts/CategoryLayout.astro';
+import { getCategoryBySlug } from '../../data/tools';
+
+const category = getCategoryBySlug('converter-tools')!;
+---
+
+<CategoryLayout
+  category={category}
+  description="Free online converter tools for measurements, numbers, colors and data formats. Length, weight, temperature, color converters and more — all running in your browser."
+/>

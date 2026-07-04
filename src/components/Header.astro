@@ -1,0 +1,181 @@
+---
+import { getIcon } from '../utils/icons';
+import { categories } from '../data/tools';
+
+interface Props {
+  currentPath?: string;
+}
+const { currentPath = '' } = Astro.props;
+
+const navLinks = [
+  { label: 'Text Tools', href: '/text-tools' },
+  { label: 'Developer', href: '/developer-tools' },
+  { label: 'Converters', href: '/converter-tools' },
+  { label: 'Calculators', href: '/calculators' },
+  { label: 'Generators', href: '/generators' },
+];
+---
+
+<header
+  class="sticky top-0 z-50 w-full border-b transition-colors duration-200"
+  style="background-color: var(--color-canvas); border-color: var(--color-hairline);"
+  id="site-header"
+>
+  <div class="mx-auto flex h-16 max-w-[1400px] items-center justify-between px-4 md:px-6">
+    <!-- Logo -->
+    <a
+      href="/"
+      class="flex items-center gap-2 font-semibold text-base tracking-tight transition-opacity hover:opacity-80"
+      style="color: var(--color-ink);"
+      aria-label="ToolHub — Home"
+    >
+      <span
+        class="flex h-7 w-7 items-center justify-center rounded-md text-white text-sm font-bold"
+        style="background-color: var(--color-ink);"
+        aria-hidden="true"
+      >T</span>
+      <span>ToolHub</span>
+    </a>
+
+    <!-- Desktop Nav -->
+    <nav class="hidden md:flex items-center gap-1" aria-label="Main navigation">
+      {navLinks.map((link) => {
+        const isActive = currentPath.startsWith(link.href);
+        return (
+          <a
+            href={link.href}
+            class="rounded-full px-3 py-1.5 text-sm transition-colors duration-150"
+            style={isActive
+              ? 'color: var(--color-ink); background-color: var(--color-canvas-soft-2); font-weight: 500;'
+              : 'color: var(--color-body-text);'}
+            aria-current={isActive ? 'page' : undefined}
+          >
+            {link.label}
+          </a>
+        );
+      })}
+    </nav>
+
+    <!-- Right Actions -->
+    <div class="flex items-center gap-2">
+      <!-- Search -->
+      <a
+        href="/search"
+        class="hidden sm:flex items-center gap-2 rounded-md border px-3 h-8 text-sm transition-colors hover:border-[var(--color-hairline-strong)]"
+        style="color: var(--color-mute); border-color: var(--color-hairline); background-color: var(--color-canvas);"
+        aria-label="Search tools"
+      >
+        <span set:html={getIcon('search', 14)} />
+        <span class="hidden lg:inline">Search tools...</span>
+        <kbd class="hidden lg:inline text-xs rounded px-1 py-0.5" style="background-color: var(--color-canvas-soft-2); color: var(--color-mute);">⌘K</kbd>
+      </a>
+
+      <!-- Dark Mode Toggle -->
+      <button
+        data-theme-toggle
+        class="flex h-8 w-8 items-center justify-center rounded-full border transition-colors hover:border-[var(--color-hairline-strong)]"
+        style="border-color: var(--color-hairline); color: var(--color-body-text);"
+        aria-label="Toggle dark mode"
+        type="button"
+      >
+        <span data-theme-icon-sun set:html={getIcon('sun', 15)} />
+        <span data-theme-icon-moon style="display:none;" set:html={getIcon('moon', 15)} />
+      </button>
+
+      <!-- Mobile Menu Button -->
+      <button
+        id="mobile-menu-btn"
+        class="flex md:hidden h-8 w-8 items-center justify-center rounded-full border transition-colors"
+        style="border-color: var(--color-hairline); color: var(--color-body-text);"
+        aria-label="Open menu"
+        aria-expanded="false"
+        aria-controls="mobile-menu"
+        type="button"
+      >
+        <span id="menu-icon-open" set:html={getIcon('menu', 16)} />
+        <span id="menu-icon-close" class="hidden" set:html={getIcon('x', 16)} />
+      </button>
+    </div>
+  </div>
+
+  <!-- Mobile Menu -->
+  <div
+    id="mobile-menu"
+    class="hidden md:hidden border-t"
+    style="border-color: var(--color-hairline); background-color: var(--color-canvas);"
+    aria-hidden="true"
+  >
+    <nav class="mx-auto max-w-[1400px] px-4 py-3 flex flex-col gap-1" aria-label="Mobile navigation">
+      {navLinks.map((link) => {
+        const isActive = currentPath.startsWith(link.href);
+        return (
+          <a
+            href={link.href}
+            class="rounded-md px-3 py-2 text-sm transition-colors"
+            style={isActive
+              ? 'color: var(--color-ink); background-color: var(--color-canvas-soft-2); font-weight: 500;'
+              : 'color: var(--color-body-text);'}
+          >
+            {link.label}
+          </a>
+        );
+      })}
+      <a
+        href="/search"
+        class="rounded-md px-3 py-2 text-sm transition-colors"
+        style="color: var(--color-body-text);"
+      >
+        Search Tools
+      </a>
+    </nav>
+  </div>
+</header>
+
+<script>
+  const btn = document.getElementById('mobile-menu-btn');
+  const menu = document.getElementById('mobile-menu');
+  const iconOpen = document.getElementById('menu-icon-open');
+  const iconClose = document.getElementById('menu-icon-close');
+
+  btn?.addEventListener('click', () => {
+    const isOpen = menu?.classList.toggle('hidden') === false;
+    btn.setAttribute('aria-expanded', String(isOpen));
+    menu?.setAttribute('aria-hidden', String(!isOpen));
+    iconOpen?.classList.toggle('hidden', isOpen);
+    iconClose?.classList.toggle('hidden', !isOpen);
+  });
+
+  // Sync dark mode icons on load
+  const isDark = document.documentElement.classList.contains('dark');
+  const sunIcons = document.querySelectorAll('[data-theme-icon-sun]');
+  const moonIcons = document.querySelectorAll('[data-theme-icon-moon]');
+  sunIcons.forEach(el => (el as HTMLElement).style.display = isDark ? 'none' : 'block');
+  moonIcons.forEach(el => (el as HTMLElement).style.display = isDark ? 'block' : 'none');
+</script>
+
+<style>
+  html.dark header {
+    background-color: var(--color-dark-canvas) !important;
+    border-color: var(--color-dark-hairline) !important;
+  }
+  html.dark #mobile-menu {
+    background-color: var(--color-dark-canvas) !important;
+    border-color: var(--color-dark-hairline) !important;
+  }
+  html.dark header a,
+  html.dark #mobile-menu a {
+    color: var(--color-dark-body) !important;
+  }
+  html.dark header a[aria-current="page"],
+  html.dark #mobile-menu a[style*="font-weight: 500"] {
+    color: var(--color-dark-ink) !important;
+    background-color: var(--color-dark-canvas-soft-2) !important;
+  }
+  html.dark header button {
+    border-color: var(--color-dark-hairline) !important;
+    color: var(--color-dark-body) !important;
+  }
+  html.dark header .logo-text {
+    color: var(--color-dark-ink) !important;
+  }
+</style>

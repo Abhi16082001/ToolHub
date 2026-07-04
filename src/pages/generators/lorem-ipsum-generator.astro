@@ -1,0 +1,147 @@
+---
+import ToolLayout from '../../layouts/ToolLayout.astro';
+import { getToolBySlug, getRelatedTools } from '../../data/tools';
+
+const tool = getToolBySlug('generators', 'lorem-ipsum-generator')!;
+const relatedTools = getRelatedTools(tool, 4);
+
+const faqs = [
+  { question: 'What is Lorem Ipsum?', answer: 'Lorem Ipsum is placeholder text commonly used in design and publishing. It has been used since the 1500s to demonstrate the visual form of a document without relying on meaningful content.' },
+  { question: 'Is this real Latin?', answer: 'Lorem Ipsum is derived from a work by Cicero but has been scrambled and altered, so it is not real Latin. It is intentionally meaningless placeholder text.' },
+  { question: 'Can I generate custom amounts?', answer: 'Yes. You can specify the number of words, sentences, or paragraphs to generate.' },
+];
+---
+
+<ToolLayout
+  tool={tool}
+  title="Lorem Ipsum Generator"
+  description="Generate placeholder Lorem Ipsum text for designs and mockups. Choose words, sentences or paragraphs. Free online Lorem Ipsum generator — works in your browser."
+  faqs={faqs}
+  relatedTools={relatedTools}
+>
+  <div slot="tool" class="space-y-4 max-w-2xl">
+    <!-- Controls -->
+    <div class="flex flex-wrap items-center gap-3">
+      <div class="flex items-center gap-2">
+        <label for="lorem-count" class="text-sm font-medium" style="color: var(--color-ink);">Generate</label>
+        <input id="lorem-count" type="number" min="1" max="100" value="5" class="rounded-md border px-3 h-9 text-sm w-20" style="background-color: var(--color-canvas); border-color: var(--color-hairline); color: var(--color-ink);" />
+      </div>
+      <div class="flex rounded-lg border overflow-hidden text-sm" style="border-color: var(--color-hairline);">
+        {[
+          { id: 'unit-paragraphs', label: 'Paragraphs' },
+          { id: 'unit-sentences', label: 'Sentences' },
+          { id: 'unit-words', label: 'Words' },
+        ].map((u, i) => (
+          <button type="button" class="lorem-unit px-3 py-2 font-medium transition-colors" data-unit={u.id.replace('unit-', '')} style={i === 0 ? 'background-color: var(--color-ink); color: #ffffff;' : 'background-color: var(--color-canvas); color: var(--color-body-text);'}>
+            {u.label}
+          </button>
+        ))}
+      </div>
+      <label class="flex items-center gap-2 text-sm cursor-pointer" style="color: var(--color-body-text);">
+        <input type="checkbox" id="lorem-start-with" checked class="accent-[var(--color-ink)]" />
+        Start with "Lorem ipsum..."
+      </label>
+    </div>
+
+    <button id="btn-generate-lorem" type="button" class="rounded-full px-6 h-10 font-medium text-sm" style="background-color: var(--color-ink); color: #ffffff;">
+      Generate
+    </button>
+
+    <!-- Output -->
+    <div>
+      <div class="flex items-center justify-between mb-2">
+        <label for="lorem-output" class="text-sm font-medium" style="color: var(--color-ink);">Generated text</label>
+        <button id="btn-copy-lorem" type="button" class="text-sm font-medium" style="color: var(--color-link);">Copy</button>
+      </div>
+      <textarea id="lorem-output" rows="12" readonly class="w-full rounded-lg border px-4 py-3 text-sm resize-y leading-relaxed" style="background-color: var(--color-canvas-soft-2); border-color: var(--color-hairline); color: var(--color-ink); min-height: 240px;" aria-live="polite"></textarea>
+    </div>
+  </div>
+
+  <div slot="content">
+    <section aria-labelledby="how-to-use">
+      <h2 id="how-to-use" class="text-display-sm mb-3" style="color: var(--color-ink);">How to use</h2>
+      <ol class="space-y-2 text-sm leading-relaxed" style="color: var(--color-body-text);">
+        <li>1. Choose how many paragraphs, sentences, or words to generate.</li>
+        <li>2. Click <strong>Generate</strong> to create the text.</li>
+        <li>3. Click <strong>Copy</strong> to copy it to your clipboard.</li>
+      </ol>
+    </section>
+  </div>
+</ToolLayout>
+
+<script>
+  const WORDS = 'lorem ipsum dolor sit amet consectetur adipiscing elit sed do eiusmod tempor incididunt ut labore et dolore magna aliqua ut enim ad minim veniam quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur excepteur sint occaecat cupidatat non proident sunt in culpa qui officia deserunt mollit anim id est laborum'.split(' ');
+
+  const countInput = document.getElementById('lorem-count') as HTMLInputElement;
+  const output = document.getElementById('lorem-output') as HTMLTextAreaElement;
+  const btnGenerate = document.getElementById('btn-generate-lorem')!;
+  const btnCopy = document.getElementById('btn-copy-lorem')!;
+  const startWith = document.getElementById('lorem-start-with') as HTMLInputElement;
+  const unitBtns = document.querySelectorAll('.lorem-unit');
+
+  let unit = 'paragraphs';
+
+  unitBtns.forEach(btn => {
+    btn.addEventListener('click', () => {
+      unit = (btn as HTMLElement).dataset.unit!;
+      unitBtns.forEach(b => {
+        (b as HTMLElement).style.backgroundColor = 'var(--color-canvas)';
+        (b as HTMLElement).style.color = 'var(--color-body-text)';
+      });
+      (btn as HTMLElement).style.backgroundColor = 'var(--color-ink)';
+      (btn as HTMLElement).style.color = '#ffffff';
+    });
+  });
+
+  function rnd(arr: string[]): string {
+    return arr[Math.floor(Math.random() * arr.length)];
+  }
+
+  function sentence(): string {
+    const len = 8 + Math.floor(Math.random() * 12);
+    const words = Array.from({ length: len }, () => rnd(WORDS));
+    words[0] = words[0].charAt(0).toUpperCase() + words[0].slice(1);
+    return words.join(' ') + '.';
+  }
+
+  function paragraph(): string {
+    const count = 4 + Math.floor(Math.random() * 4);
+    return Array.from({ length: count }, sentence).join(' ');
+  }
+
+  function generate() {
+    const count = Math.min(100, Math.max(1, parseInt(countInput.value, 10) || 5));
+    let text = '';
+    if (unit === 'paragraphs') {
+      const paras = Array.from({ length: count }, paragraph);
+      if (startWith.checked) paras[0] = 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. ' + paras[0];
+      text = paras.join('\n\n');
+    } else if (unit === 'sentences') {
+      const sents = Array.from({ length: count }, sentence);
+      if (startWith.checked) sents[0] = 'Lorem ipsum dolor sit amet, consectetur adipiscing elit.';
+      text = sents.join(' ');
+    } else {
+      const words = Array.from({ length: count }, () => rnd(WORDS));
+      if (startWith.checked) words[0] = 'Lorem';
+      text = words.join(' ');
+    }
+    output.value = text;
+  }
+
+  btnGenerate.addEventListener('click', generate);
+  btnCopy.addEventListener('click', async () => {
+    if (!output.value) return;
+    await navigator.clipboard.writeText(output.value).catch(() => {});
+    const orig = btnCopy.textContent; btnCopy.textContent = 'Copied!';
+    setTimeout(() => { btnCopy.textContent = orig; }, 2000);
+  });
+
+  generate();
+</script>
+
+<style>
+  html.dark input[type="number"] { background-color: var(--color-dark-canvas-soft) !important; border-color: var(--color-dark-hairline) !important; color: var(--color-dark-ink) !important; }
+  html.dark button[style*="var(--color-canvas)"] { background-color: var(--color-dark-canvas-soft) !important; border-color: var(--color-dark-hairline) !important; color: var(--color-dark-body) !important; }
+  html.dark textarea { background-color: var(--color-dark-canvas-soft-2) !important; border-color: var(--color-dark-hairline) !important; color: var(--color-dark-ink) !important; }
+  html.dark label { color: var(--color-dark-body) !important; }
+</style>

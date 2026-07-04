@@ -1,0 +1,149 @@
+---
+import ToolLayout from '../../layouts/ToolLayout.astro';
+import { getToolBySlug, getRelatedTools } from '../../data/tools';
+
+const tool = getToolBySlug('developer-tools', 'base64-encoder-decoder')!;
+const relatedTools = getRelatedTools(tool, 4);
+
+const faqs = [
+  { question: 'What is Base64?', answer: 'Base64 is an encoding scheme that converts binary data into ASCII text. It is commonly used to transmit data over text-based protocols like HTTP or email.' },
+  { question: 'Is Base64 encryption?', answer: 'No. Base64 is encoding, not encryption. It is easily reversible and provides no security. Do not use it to protect sensitive data.' },
+  { question: 'Is my data uploaded anywhere?', answer: 'No. All encoding and decoding happens locally in your browser using JavaScript.' },
+  { question: 'Does it support Unicode?', answer: 'Yes. The tool handles Unicode characters by encoding them as UTF-8 before Base64 encoding.' },
+];
+---
+
+<ToolLayout
+  tool={tool}
+  title="Base64 Encoder / Decoder"
+  description="Encode and decode Base64 strings instantly. Supports text and Unicode. Free online Base64 encoder decoder — works entirely in your browser."
+  faqs={faqs}
+  relatedTools={relatedTools}
+>
+  <div slot="tool" class="space-y-4">
+    <!-- Mode -->
+    <div class="flex rounded-lg border overflow-hidden" style="border-color: var(--color-hairline);">
+      <button id="mode-encode" type="button" class="flex-1 py-2.5 text-sm font-medium" style="background-color: var(--color-ink); color: #ffffff;" aria-pressed="true">Encode</button>
+      <button id="mode-decode" type="button" class="flex-1 py-2.5 text-sm font-medium" style="background-color: var(--color-canvas); color: var(--color-body-text);" aria-pressed="false">Decode</button>
+    </div>
+
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-4">
+      <div>
+        <label for="b64-input" class="block text-sm font-medium mb-2" style="color: var(--color-ink);" id="b64-input-label">Plain text</label>
+        <textarea id="b64-input" rows="10" placeholder="Enter text to encode..." class="w-full rounded-lg border px-4 py-3 text-sm font-mono resize-y focus:outline-none focus:ring-2 focus:ring-[var(--color-link)] focus:border-transparent" style="background-color: var(--color-canvas); border-color: var(--color-hairline); color: var(--color-ink); min-height: 200px;" spellcheck="false"></textarea>
+      </div>
+      <div>
+        <div class="flex items-center justify-between mb-2">
+          <label for="b64-output" class="block text-sm font-medium" style="color: var(--color-ink);" id="b64-output-label">Base64 encoded</label>
+          <span id="b64-error" class="text-xs hidden" style="color: var(--color-error);">Invalid Base64</span>
+        </div>
+        <textarea id="b64-output" rows="10" readonly placeholder="Result will appear here..." class="w-full rounded-lg border px-4 py-3 text-sm font-mono resize-y" style="background-color: var(--color-canvas-soft-2); border-color: var(--color-hairline); color: var(--color-ink); min-height: 200px; cursor: default;" aria-live="polite" spellcheck="false"></textarea>
+      </div>
+    </div>
+
+    <div class="flex gap-2">
+      <button id="btn-copy-b64" type="button" class="inline-flex items-center gap-2 rounded-full border px-4 h-9 text-sm font-medium" style="border-color: var(--color-hairline); color: var(--color-body-text); background-color: var(--color-canvas);">Copy Result</button>
+      <button id="btn-swap-b64" type="button" class="inline-flex items-center gap-2 rounded-full border px-4 h-9 text-sm font-medium" style="border-color: var(--color-hairline); color: var(--color-body-text); background-color: var(--color-canvas);">⇄ Swap</button>
+      <button id="btn-clear-b64" type="button" class="inline-flex items-center gap-2 rounded-full border px-4 h-9 text-sm font-medium" style="border-color: var(--color-hairline); color: var(--color-body-text); background-color: var(--color-canvas);">Clear</button>
+    </div>
+  </div>
+
+  <div slot="content">
+    <section aria-labelledby="how-to-use">
+      <h2 id="how-to-use" class="text-display-sm mb-3" style="color: var(--color-ink);">How to use</h2>
+      <ol class="space-y-2 text-sm leading-relaxed" style="color: var(--color-body-text);">
+        <li>1. Choose Encode or Decode mode.</li>
+        <li>2. Enter your text in the input area.</li>
+        <li>3. The result updates instantly in the output area.</li>
+        <li>4. Click Copy Result to copy the output.</li>
+      </ol>
+    </section>
+  </div>
+</ToolLayout>
+
+<script>
+  const input = document.getElementById('b64-input') as HTMLTextAreaElement;
+  const output = document.getElementById('b64-output') as HTMLTextAreaElement;
+  const modeEncode = document.getElementById('mode-encode')!;
+  const modeDecode = document.getElementById('mode-decode')!;
+  const inputLabel = document.getElementById('b64-input-label')!;
+  const outputLabel = document.getElementById('b64-output-label')!;
+  const errorEl = document.getElementById('b64-error')!;
+  const btnCopy = document.getElementById('btn-copy-b64')!;
+  const btnSwap = document.getElementById('btn-swap-b64')!;
+  const btnClear = document.getElementById('btn-clear-b64')!;
+
+  let mode: 'encode' | 'decode' = 'encode';
+
+  function encode(text: string): string {
+    return btoa(unescape(encodeURIComponent(text)));
+  }
+
+  function decode(text: string): string {
+    return decodeURIComponent(escape(atob(text)));
+  }
+
+  function process() {
+    const text = input.value;
+    errorEl.classList.add('hidden');
+    if (!text) { output.value = ''; return; }
+    try {
+      output.value = mode === 'encode' ? encode(text) : decode(text);
+    } catch {
+      output.value = '';
+      errorEl.classList.remove('hidden');
+    }
+  }
+
+  function setMode(m: 'encode' | 'decode') {
+    mode = m;
+    if (m === 'encode') {
+      modeEncode.style.backgroundColor = 'var(--color-ink)';
+      modeEncode.style.color = '#ffffff';
+      modeDecode.style.backgroundColor = 'var(--color-canvas)';
+      modeDecode.style.color = 'var(--color-body-text)';
+      inputLabel.textContent = 'Plain text';
+      outputLabel.textContent = 'Base64 encoded';
+      input.placeholder = 'Enter text to encode...';
+    } else {
+      modeDecode.style.backgroundColor = 'var(--color-ink)';
+      modeDecode.style.color = '#ffffff';
+      modeEncode.style.backgroundColor = 'var(--color-canvas)';
+      modeEncode.style.color = 'var(--color-body-text)';
+      inputLabel.textContent = 'Base64 encoded';
+      outputLabel.textContent = 'Decoded text';
+      input.placeholder = 'Enter Base64 to decode...';
+    }
+    process();
+  }
+
+  modeEncode.addEventListener('click', () => setMode('encode'));
+  modeDecode.addEventListener('click', () => setMode('decode'));
+  input.addEventListener('input', process);
+
+  btnCopy.addEventListener('click', async () => {
+    if (!output.value) return;
+    await navigator.clipboard.writeText(output.value).catch(() => {});
+    const orig = btnCopy.textContent; btnCopy.textContent = 'Copied!';
+    setTimeout(() => { btnCopy.textContent = orig; }, 2000);
+  });
+
+  btnSwap.addEventListener('click', () => {
+    const temp = input.value;
+    input.value = output.value;
+    setMode(mode === 'encode' ? 'decode' : 'encode');
+    process();
+  });
+
+  btnClear.addEventListener('click', () => {
+    input.value = ''; output.value = '';
+    errorEl.classList.add('hidden');
+    input.focus();
+  });
+</script>
+
+<style>
+  html.dark textarea { background-color: var(--color-dark-canvas-soft) !important; border-color: var(--color-dark-hairline) !important; color: var(--color-dark-ink) !important; }
+  html.dark textarea[readonly] { background-color: var(--color-dark-canvas-soft-2) !important; }
+  html.dark button[style*="var(--color-canvas)"] { background-color: var(--color-dark-canvas-soft) !important; border-color: var(--color-dark-hairline) !important; color: var(--color-dark-body) !important; }
+</style>

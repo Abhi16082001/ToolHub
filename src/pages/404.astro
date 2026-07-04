@@ -1,0 +1,47 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import Header from '../components/Header.astro';
+import Footer from '../components/Footer.astro';
+import { getIcon } from '../utils/icons';
+---
+
+<BaseLayout
+  title="Page Not Found | ToolHub"
+  description="The page you are looking for does not exist."
+  noindex={true}
+>
+  <Header />
+
+  <main id="main-content" class="mx-auto max-w-[1400px] px-4 md:px-6 py-24 text-center">
+    <p class="text-caption-mono mb-4" style="color: var(--color-mute);">404 — Not Found</p>
+    <h1 class="text-display-xl mb-4" style="color: var(--color-ink);">Page not found.</h1>
+    <p class="text-body-lg mb-8 max-w-md mx-auto" style="color: var(--color-body-text);">
+      The page you are looking for does not exist or has been moved.
+    </p>
+    <div class="flex flex-wrap items-center justify-center gap-3">
+      <a
+        href="/"
+        class="inline-flex items-center gap-2 rounded-full px-5 h-11 font-medium text-sm"
+        style="background-color: var(--color-ink); color: #ffffff;"
+      >
+        <span set:html={getIcon('home', 15)} />
+        Go Home
+      </a>
+      <a
+        href="/search"
+        class="inline-flex items-center gap-2 rounded-full border px-5 h-11 font-medium text-sm"
+        style="border-color: var(--color-hairline); color: var(--color-ink);"
+      >
+        <span set:html={getIcon('search', 15)} />
+        Search Tools
+      </a>
+    </div>
+  </main>
+
+  <Footer />
+</BaseLayout>
+
+<style>
+  html.dark h1 { color: var(--color-dark-ink) !important; }
+  html.dark p { color: var(--color-dark-body) !important; }
+</style>

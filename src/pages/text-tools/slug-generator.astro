@@ -1,0 +1,121 @@
+---
+import ToolLayout from '../../layouts/ToolLayout.astro';
+import { getToolBySlug, getRelatedTools } from '../../data/tools';
+
+const tool = getToolBySlug('text-tools', 'slug-generator')!;
+const relatedTools = getRelatedTools(tool, 4);
+
+const faqs = [
+  { question: 'What is a slug?', answer: 'A slug is a URL-friendly version of a string. It uses only lowercase letters, numbers, and hyphens — no spaces or special characters.' },
+  { question: 'Why are slugs important for SEO?', answer: 'Clean, descriptive slugs help search engines understand your page content and improve your URL readability for users.' },
+  { question: 'Does this handle accented characters?', answer: 'Yes. Accented characters like é, ü, and ñ are normalized to their ASCII equivalents before generating the slug.' },
+];
+---
+
+<ToolLayout
+  tool={tool}
+  title="Slug Generator"
+  description="Convert any text into a clean, URL-friendly slug instantly. Perfect for blog posts, page URLs, and SEO-friendly links. Free online slug generator."
+  faqs={faqs}
+  relatedTools={relatedTools}
+>
+  <div slot="tool" class="space-y-4">
+    <div>
+      <label for="slug-input" class="block text-sm font-medium mb-2" style="color: var(--color-ink);">Enter text</label>
+      <input
+        id="slug-input"
+        type="text"
+        placeholder="My Blog Post Title Here"
+        class="w-full rounded-lg border px-4 h-11 text-sm transition-colors focus:outline-none focus:ring-2 focus:ring-[var(--color-link)] focus:border-transparent"
+        style="background-color: var(--color-canvas); border-color: var(--color-hairline); color: var(--color-ink);"
+      />
+    </div>
+
+    <!-- Output -->
+    <div
+      class="flex items-center gap-3 rounded-lg border px-4 py-3"
+      style="background-color: var(--color-canvas-soft-2); border-color: var(--color-hairline);"
+    >
+      <code id="slug-output" class="flex-1 text-sm font-mono break-all" style="color: var(--color-ink);">
+        your-slug-will-appear-here
+      </code>
+      <button
+        id="btn-copy-slug"
+        type="button"
+        class="shrink-0 inline-flex items-center gap-1.5 rounded-full border px-3 h-8 text-xs font-medium transition-colors hover:border-[var(--color-hairline-strong)]"
+        style="border-color: var(--color-hairline); color: var(--color-body-text); background-color: var(--color-canvas);"
+      >
+        Copy
+      </button>
+    </div>
+
+    <!-- Options -->
+    <div class="flex flex-wrap gap-4">
+      <label class="flex items-center gap-2 text-sm cursor-pointer" style="color: var(--color-body-text);">
+        <input type="checkbox" id="opt-lowercase" checked class="accent-[var(--color-ink)]" />
+        Lowercase
+      </label>
+      <label class="flex items-center gap-2 text-sm cursor-pointer" style="color: var(--color-body-text);">
+        <input type="checkbox" id="opt-trim-hyphens" checked class="accent-[var(--color-ink)]" />
+        Trim hyphens
+      </label>
+    </div>
+  </div>
+
+  <div slot="content">
+    <section aria-labelledby="how-to-use">
+      <h2 id="how-to-use" class="text-display-sm mb-3" style="color: var(--color-ink);">How to use</h2>
+      <ol class="space-y-2 text-sm leading-relaxed" style="color: var(--color-body-text);">
+        <li>1. Type or paste your text in the input field.</li>
+        <li>2. The slug is generated instantly below.</li>
+        <li>3. Click Copy to copy the slug to your clipboard.</li>
+      </ol>
+    </section>
+  </div>
+</ToolLayout>
+
+<script>
+  const input = document.getElementById('slug-input') as HTMLInputElement;
+  const output = document.getElementById('slug-output')!;
+  const btnCopy = document.getElementById('btn-copy-slug')!;
+  const optLower = document.getElementById('opt-lowercase') as HTMLInputElement;
+  const optTrim = document.getElementById('opt-trim-hyphens') as HTMLInputElement;
+
+  function toSlug(text: string): string {
+    let slug = text
+      .normalize('NFD')
+      .replace(/[\u0300-\u036f]/g, '')
+      .replace(/[^a-zA-Z0-9\s-]/g, '')
+      .trim()
+      .replace(/\s+/g, '-')
+      .replace(/-+/g, '-');
+    if (optLower.checked) slug = slug.toLowerCase();
+    if (optTrim.checked) slug = slug.replace(/^-+|-+$/g, '');
+    return slug || 'your-slug-will-appear-here';
+  }
+
+  function update() {
+    output.textContent = toSlug(input.value);
+  }
+
+  input.addEventListener('input', update);
+  optLower.addEventListener('change', update);
+  optTrim.addEventListener('change', update);
+
+  btnCopy.addEventListener('click', async () => {
+    const text = output.textContent ?? '';
+    if (!text || text === 'your-slug-will-appear-here') return;
+    await navigator.clipboard.writeText(text).catch(() => {});
+    const orig = btnCopy.textContent;
+    btnCopy.textContent = 'Copied!';
+    setTimeout(() => { btnCopy.textContent = orig; }, 2000);
+  });
+</script>
+
+<style>
+  html.dark input[type="text"] { background-color: var(--color-dark-canvas-soft) !important; border-color: var(--color-dark-hairline) !important; color: var(--color-dark-ink) !important; }
+  html.dark div[style*="var(--color-canvas-soft-2)"] { background-color: var(--color-dark-canvas-soft-2) !important; border-color: var(--color-dark-hairline) !important; }
+  html.dark code { color: var(--color-dark-ink) !important; }
+  html.dark button { background-color: var(--color-dark-canvas-soft) !important; border-color: var(--color-dark-hairline) !important; color: var(--color-dark-body) !important; }
+  html.dark label { color: var(--color-dark-body) !important; }
+</style>

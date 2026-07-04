@@ -1,0 +1,88 @@
+---
+import BaseLayout from './BaseLayout.astro';
+import Header from '../components/Header.astro';
+import Footer from '../components/Footer.astro';
+import Breadcrumb from '../components/Breadcrumb.astro';
+import ToolCard from '../components/ToolCard.astro';
+import { getIcon } from '../utils/icons';
+import type { Category } from '../types/tool';
+
+interface Props {
+  category: Category;
+  description: string;
+}
+
+const { category, description } = Astro.props;
+
+const schema = {
+  "@context": "https://schema.org",
+  "@type": "CollectionPage",
+  "name": `${category.name} | ToolHub`,
+  "description": description,
+  "url": `https://toolhub.dev/${category.slug}`,
+};
+---
+
+<BaseLayout
+  title={`${category.name} | ToolHub`}
+  description={description}
+  schema={schema}
+>
+  <Header currentPath={`/${category.slug}`} />
+
+  <main id="main-content" class="mx-auto max-w-[1400px] px-4 md:px-6 py-8">
+    <!-- Breadcrumb -->
+    <div class="mb-6">
+      <Breadcrumb items={[{ label: category.name }]} />
+    </div>
+
+    <!-- Category Header -->
+    <header class="mb-10">
+      <div class="flex items-center gap-3 mb-3">
+        <span
+          class="flex h-10 w-10 items-center justify-center rounded-lg"
+          style="background-color: var(--color-canvas-soft-2); color: var(--color-ink);"
+          aria-hidden="true"
+        >
+          <span set:html={getIcon(category.icon, 20)} />
+        </span>
+        <span class="text-caption-mono" style="color: var(--color-mute);">
+          {category.tools.length} tools
+        </span>
+      </div>
+      <h1 class="text-display-lg mb-3" style="color: var(--color-ink);">{category.name}</h1>
+      <p class="text-body-lg max-w-2xl" style="color: var(--color-body-text);">{description}</p>
+    </header>
+
+    <!-- Optional intro slot -->
+    <slot name="intro" />
+
+    <!-- Tool Grid -->
+    <section aria-labelledby="tools-heading">
+      <h2 id="tools-heading" class="sr-only">All {category.name}</h2>
+      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3">
+        {category.tools.map((tool) => (
+          <ToolCard tool={tool} />
+        ))}
+      </div>
+    </section>
+
+    <!-- Optional extra content -->
+    <slot name="content" />
+  </main>
+
+  <Footer />
+</BaseLayout>
+
+<style>
+  html.dark h1 {
+    color: var(--color-dark-ink) !important;
+  }
+  html.dark p {
+    color: var(--color-dark-body) !important;
+  }
+  html.dark span[style*="background-color: var(--color-canvas-soft-2)"] {
+    background-color: var(--color-dark-canvas-soft-2) !important;
+    color: var(--color-dark-ink) !important;
+  }
+</style>

@@ -1,0 +1,11 @@
+---
+import CategoryLayout from '../../layouts/CategoryLayout.astro';
+import { getCategoryBySlug } from '../../data/tools';
+
+const category = getCategoryBySlug('developer-tools')!;
+---
+
+<CategoryLayout
+  category={category}
+  description="Free online developer tools for formatting, encoding, validating and debugging. JSON formatters, Base64 encoders, UUID generators and more — all in your browser."
+/>

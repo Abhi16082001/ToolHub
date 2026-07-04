@@ -1,0 +1,99 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import Header from '../components/Header.astro';
+import Footer from '../components/Footer.astro';
+import ToolCard from '../components/ToolCard.astro';
+import { allTools } from '../data/tools';
+---
+
+<BaseLayout
+  title="Search Tools | ToolHub"
+  description="Search all free online tools on ToolHub. Find text tools, developer tools, converters, calculators and generators."
+>
+  <Header currentPath="/search" />
+
+  <main id="main-content" class="mx-auto max-w-[1400px] px-4 md:px-6 py-8">
+    <div class="mb-8">
+      <h1 class="text-display-lg mb-2" style="color: var(--color-ink);">Search Tools</h1>
+      <p class="text-body-lg" style="color: var(--color-body-text);">Find the right tool for your task.</p>
+    </div>
+
+    <!-- Search Input -->
+    <div class="relative mb-8 max-w-xl">
+      <span class="absolute left-4 top-1/2 -translate-y-1/2" style="color: var(--color-mute);">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+      </span>
+      <input
+        id="search-input"
+        type="search"
+        placeholder="Search tools..."
+        autofocus
+        class="w-full rounded-lg border pl-10 pr-4 h-12 text-sm transition-colors focus:outline-none focus:ring-2 focus:ring-[var(--color-link)] focus:border-transparent"
+        style="background-color: var(--color-canvas); border-color: var(--color-hairline); color: var(--color-ink);"
+        aria-label="Search tools"
+        aria-controls="search-results"
+      />
+    </div>
+
+    <!-- Results -->
+    <div id="search-results" aria-live="polite" aria-label="Search results">
+      <p id="search-count" class="text-sm mb-4" style="color: var(--color-mute);">
+        {allTools.length} tools available
+      </p>
+      <div id="results-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3">
+        {allTools.map((tool) => (
+          <div data-tool-name={tool.name.toLowerCase()} data-tool-desc={tool.description.toLowerCase()} data-tool-tags={(tool.tags ?? []).join(' ')}>
+            <ToolCard tool={tool} />
+          </div>
+        ))}
+      </div>
+      <p id="no-results" class="hidden text-sm py-8 text-center" style="color: var(--color-mute);">
+        No tools found. Try a different search term.
+      </p>
+    </div>
+  </main>
+
+  <Footer />
+</BaseLayout>
+
+<script>
+  const searchInput = document.getElementById('search-input') as HTMLInputElement;
+  const searchCount = document.getElementById('search-count')!;
+  const noResults = document.getElementById('no-results')!;
+  const items = document.querySelectorAll('[data-tool-name]');
+
+  function search(query: string) {
+    const q = query.toLowerCase().trim();
+    let visible = 0;
+    items.forEach((item) => {
+      const el = item as HTMLElement;
+      const name = el.dataset.toolName ?? '';
+      const desc = el.dataset.toolDesc ?? '';
+      const tags = el.dataset.toolTags ?? '';
+      const match = !q || name.includes(q) || desc.includes(q) || tags.includes(q);
+      el.style.display = match ? '' : 'none';
+      if (match) visible++;
+    });
+    searchCount.textContent = `${visible} tool${visible === 1 ? '' : 's'} found`;
+    noResults.classList.toggle('hidden', visible > 0);
+  }
+
+  searchInput.addEventListener('input', (e) => {
+    search((e.target as HTMLInputElement).value);
+  });
+
+  // Support keyboard shortcut ⌘K / Ctrl+K
+  document.addEventListener('keydown', (e) => {
+    if ((e.metaKey || e.ctrlKey) && e.key === 'k') {
+      e.preventDefault();
+      searchInput.focus();
+      searchInput.select();
+    }
+  });
+</script>
+
+<style>
+  html.dark input[type="search"] { background-color: var(--color-dark-canvas-soft) !important; border-color: var(--color-dark-hairline) !important; color: var(--color-dark-ink) !important; }
+  html.dark h1 { color: var(--color-dark-ink) !important; }
+  html.dark p { color: var(--color-dark-body) !important; }
+</style>

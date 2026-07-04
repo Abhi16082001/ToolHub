@@ -1,0 +1,174 @@
+---
+import ToolLayout from '../../layouts/ToolLayout.astro';
+import { getToolBySlug, getRelatedTools } from '../../data/tools';
+
+const tool = getToolBySlug('developer-tools', 'json-formatter')!;
+const relatedTools = getRelatedTools(tool, 4);
+
+const faqs = [
+  { question: 'What is JSON formatting?', answer: 'JSON formatting (also called prettifying or beautifying) adds proper indentation and line breaks to make JSON data human-readable.' },
+  { question: 'Is my JSON data uploaded anywhere?', answer: 'No. All formatting happens locally in your browser using JavaScript. Your data never leaves your device.' },
+  { question: 'Can I validate JSON with this tool?', answer: 'Yes. The formatter validates your JSON as it formats it. If your JSON is invalid, an error message will appear.' },
+  { question: 'What indentation options are available?', answer: 'You can choose 2 spaces, 4 spaces, or tab indentation.' },
+];
+---
+
+<ToolLayout
+  tool={tool}
+  title="JSON Formatter"
+  description="Format, beautify and validate JSON data instantly. Free online JSON formatter with syntax highlighting and error detection — works entirely in your browser."
+  faqs={faqs}
+  relatedTools={relatedTools}
+>
+  <div slot="tool" class="space-y-4">
+    <!-- Toolbar -->
+    <div class="flex flex-wrap items-center gap-2">
+      <button id="btn-format" type="button" class="inline-flex items-center gap-2 rounded-full px-4 h-9 text-sm font-medium transition-opacity hover:opacity-90" style="background-color: var(--color-ink); color: #ffffff;">
+        Format JSON
+      </button>
+      <button id="btn-minify" type="button" class="inline-flex items-center gap-2 rounded-full border px-4 h-9 text-sm font-medium transition-colors hover:border-[var(--color-hairline-strong)]" style="border-color: var(--color-hairline); color: var(--color-body-text); background-color: var(--color-canvas);">
+        Minify
+      </button>
+      <button id="btn-copy-json" type="button" class="inline-flex items-center gap-2 rounded-full border px-4 h-9 text-sm font-medium transition-colors hover:border-[var(--color-hairline-strong)]" style="border-color: var(--color-hairline); color: var(--color-body-text); background-color: var(--color-canvas);">
+        Copy
+      </button>
+      <button id="btn-clear-json" type="button" class="inline-flex items-center gap-2 rounded-full border px-4 h-9 text-sm font-medium transition-colors hover:border-[var(--color-hairline-strong)]" style="border-color: var(--color-hairline); color: var(--color-body-text); background-color: var(--color-canvas);">
+        Clear
+      </button>
+      <div class="flex items-center gap-2 ml-auto">
+        <label for="indent-select" class="text-sm" style="color: var(--color-mute);">Indent:</label>
+        <select id="indent-select" class="rounded-md border px-2 h-8 text-sm" style="background-color: var(--color-canvas); border-color: var(--color-hairline); color: var(--color-ink);">
+          <option value="2">2 spaces</option>
+          <option value="4">4 spaces</option>
+          <option value="tab">Tab</option>
+        </select>
+      </div>
+    </div>
+
+    <!-- Status -->
+    <div id="json-status" class="hidden rounded-md px-3 py-2 text-sm" role="alert" aria-live="polite"></div>
+
+    <!-- Editor -->
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-4">
+      <div>
+        <label for="json-input" class="block text-sm font-medium mb-2" style="color: var(--color-ink);">Input JSON</label>
+        <textarea
+          id="json-input"
+          rows="16"
+          placeholder='{"name": "ToolHub", "version": 1}'
+          class="w-full rounded-lg border px-4 py-3 text-sm font-mono resize-y transition-colors focus:outline-none focus:ring-2 focus:ring-[var(--color-link)] focus:border-transparent"
+          style="background-color: var(--color-canvas); border-color: var(--color-hairline); color: var(--color-ink); min-height: 300px;"
+          spellcheck="false"
+        ></textarea>
+      </div>
+      <div>
+        <label for="json-output" class="block text-sm font-medium mb-2" style="color: var(--color-ink);">Formatted output</label>
+        <textarea
+          id="json-output"
+          rows="16"
+          readonly
+          placeholder="Formatted JSON will appear here..."
+          class="w-full rounded-lg border px-4 py-3 text-sm font-mono resize-y"
+          style="background-color: var(--color-canvas-soft-2); border-color: var(--color-hairline); color: var(--color-ink); min-height: 300px; cursor: default;"
+          aria-live="polite"
+          spellcheck="false"
+        ></textarea>
+      </div>
+    </div>
+  </div>
+
+  <div slot="content">
+    <section aria-labelledby="how-to-use">
+      <h2 id="how-to-use" class="text-display-sm mb-3" style="color: var(--color-ink);">How to use</h2>
+      <ol class="space-y-2 text-sm leading-relaxed" style="color: var(--color-body-text);">
+        <li>1. Paste your JSON into the input area on the left.</li>
+        <li>2. Click <strong>Format JSON</strong> to beautify, or <strong>Minify</strong> to compress.</li>
+        <li>3. The formatted result appears on the right.</li>
+        <li>4. Click <strong>Copy</strong> to copy the output to your clipboard.</li>
+      </ol>
+    </section>
+  </div>
+</ToolLayout>
+
+<script>
+  const input = document.getElementById('json-input') as HTMLTextAreaElement;
+  const output = document.getElementById('json-output') as HTMLTextAreaElement;
+  const status = document.getElementById('json-status')!;
+  const btnFormat = document.getElementById('btn-format')!;
+  const btnMinify = document.getElementById('btn-minify')!;
+  const btnCopy = document.getElementById('btn-copy-json')!;
+  const btnClear = document.getElementById('btn-clear-json')!;
+  const indentSelect = document.getElementById('indent-select') as HTMLSelectElement;
+
+  function getIndent(): string | number {
+    const val = indentSelect.value;
+    return val === 'tab' ? '\t' : parseInt(val, 10);
+  }
+
+  function showStatus(msg: string, type: 'success' | 'error') {
+    status.textContent = msg;
+    status.className = `rounded-md px-3 py-2 text-sm ${type === 'error' ? '' : ''}`;
+    status.style.backgroundColor = type === 'error' ? 'var(--color-error-soft)' : '#d1fae5';
+    status.style.color = type === 'error' ? 'var(--color-error-deep)' : '#065f46';
+    status.classList.remove('hidden');
+  }
+
+  function hideStatus() {
+    status.classList.add('hidden');
+  }
+
+  function format() {
+    const text = input.value.trim();
+    if (!text) { hideStatus(); output.value = ''; return; }
+    try {
+      const parsed = JSON.parse(text);
+      output.value = JSON.stringify(parsed, null, getIndent());
+      showStatus('✓ Valid JSON', 'success');
+    } catch (e: any) {
+      output.value = '';
+      showStatus(`✗ Invalid JSON: ${e.message}`, 'error');
+    }
+  }
+
+  function minify() {
+    const text = input.value.trim();
+    if (!text) return;
+    try {
+      const parsed = JSON.parse(text);
+      output.value = JSON.stringify(parsed);
+      showStatus('✓ Minified', 'success');
+    } catch (e: any) {
+      showStatus(`✗ Invalid JSON: ${e.message}`, 'error');
+    }
+  }
+
+  btnFormat.addEventListener('click', format);
+  btnMinify.addEventListener('click', minify);
+
+  btnCopy.addEventListener('click', async () => {
+    if (!output.value) return;
+    await navigator.clipboard.writeText(output.value).catch(() => {});
+    const orig = btnCopy.textContent;
+    btnCopy.textContent = 'Copied!';
+    setTimeout(() => { btnCopy.textContent = orig; }, 2000);
+  });
+
+  btnClear.addEventListener('click', () => {
+    input.value = '';
+    output.value = '';
+    hideStatus();
+    input.focus();
+  });
+
+  // Auto-format on paste
+  input.addEventListener('paste', () => {
+    setTimeout(format, 10);
+  });
+</script>
+
+<style>
+  html.dark textarea { background-color: var(--color-dark-canvas-soft) !important; border-color: var(--color-dark-hairline) !important; color: var(--color-dark-ink) !important; }
+  html.dark textarea[readonly] { background-color: var(--color-dark-canvas-soft-2) !important; }
+  html.dark button[style*="var(--color-canvas)"] { background-color: var(--color-dark-canvas-soft) !important; border-color: var(--color-dark-hairline) !important; color: var(--color-dark-body) !important; }
+  html.dark select { background-color: var(--color-dark-canvas-soft) !important; border-color: var(--color-dark-hairline) !important; color: var(--color-dark-ink) !important; }
+</style>

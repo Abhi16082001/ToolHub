@@ -1,11 +1,249 @@
 ---
-import Welcome from '../components/Welcome.astro';
-import Layout from '../layouts/Layout.astro';
+import BaseLayout from '../layouts/BaseLayout.astro';
+import Header from '../components/Header.astro';
+import Footer from '../components/Footer.astro';
+import CategoryCard from '../components/CategoryCard.astro';
+import ToolCard from '../components/ToolCard.astro';
+import { getIcon } from '../utils/icons';
+import { categories, allTools } from '../data/tools';
 
-// Welcome to Astro! Wondering what to do next? Check out the Astro documentation at https://docs.astro.build
-// Don't want to use any of this? Delete everything in this file, the `assets`, `components`, and `layouts` directories, and start fresh.
+const featuredTools = allTools.filter((t) => t.priority === 'high').slice(0, 8);
+
+const stats = [
+  { value: `${allTools.length}+`, label: 'Free Tools' },
+  { value: '5', label: 'Categories' },
+  { value: '100%', label: 'Browser-based' },
+  { value: '0', label: 'Signup Required' },
+];
+
+const schema = {
+  "@context": "https://schema.org",
+  "@type": "WebPage",
+  "name": "ToolHub — Free Online Utility Tools",
+  "description": "A fast, modern collection of free online utility tools. Text tools, developer tools, converters, calculators and generators — all running in your browser.",
+  "url": "https://toolhub.dev",
+};
 ---
 
-<Layout>
-	<Welcome />
-</Layout>
+<BaseLayout
+  title="ToolHub — Free Online Utility Tools"
+  description="A fast, modern collection of free online utility tools. Text tools, developer tools, converters, calculators and generators — all running in your browser. No signup required."
+  schema={schema}
+>
+  <Header currentPath="/" />
+
+  <main id="main-content">
+    <!-- ── Hero ── -->
+    <section
+      class="relative overflow-hidden gradient-mesh"
+      style="background-color: var(--color-canvas);"
+      aria-labelledby="hero-heading"
+    >
+      <div class="mx-auto max-w-[1400px] px-4 md:px-6 py-20 md:py-28 text-center">
+        <!-- Eyebrow badge -->
+        <div class="inline-flex items-center gap-2 rounded-full border px-3 py-1 mb-6 text-caption-mono" style="border-color: var(--color-hairline); background-color: var(--color-canvas-soft); color: var(--color-mute);">
+          <span class="h-1.5 w-1.5 rounded-full bg-green-500 animate-pulse" aria-hidden="true"></span>
+          Free · No signup · Browser-based
+        </div>
+
+        <!-- Headline -->
+        <h1
+          id="hero-heading"
+          class="text-display-xl mx-auto mb-4 max-w-3xl"
+          style="color: var(--color-ink);"
+        >
+          Every tool you need,<br />right in your browser.
+        </h1>
+
+        <!-- Subheadline -->
+        <p
+          class="text-body-lg mx-auto mb-8 max-w-xl"
+          style="color: var(--color-body-text);"
+        >
+          A fast, modern collection of free utility tools. Text, developer, converter, calculator and generator tools — all running locally, no backend required.
+        </p>
+
+        <!-- CTAs -->
+        <div class="flex flex-wrap items-center justify-center gap-3">
+          <a
+            href="/text-tools"
+            class="inline-flex items-center gap-2 rounded-full px-5 h-11 font-medium text-sm transition-opacity hover:opacity-90"
+            style="background-color: var(--color-ink); color: #ffffff;"
+          >
+            Browse Tools
+            <span set:html={getIcon('arrow-right', 15)} />
+          </a>
+          <a
+            href="/generators/password-generator"
+            class="inline-flex items-center gap-2 rounded-full border px-5 h-11 font-medium text-sm transition-colors hover:border-[var(--color-hairline-strong)]"
+            style="border-color: var(--color-hairline); color: var(--color-ink); background-color: var(--color-canvas);"
+          >
+            <span set:html={getIcon('lock-keyhole', 15)} />
+            Password Generator
+          </a>
+        </div>
+
+        <!-- Stats -->
+        <div class="mt-14 grid grid-cols-2 sm:grid-cols-4 gap-6 max-w-lg mx-auto">
+          {stats.map((stat) => (
+            <div class="text-center">
+              <p class="text-display-md" style="color: var(--color-ink);">{stat.value}</p>
+              <p class="text-caption mt-0.5" style="color: var(--color-mute);">{stat.label}</p>
+            </div>
+          ))}
+        </div>
+      </div>
+    </section>
+
+    <!-- ── Categories ── -->
+    <section
+      class="py-16 md:py-20"
+      style="background-color: var(--color-canvas-soft);"
+      aria-labelledby="categories-heading"
+    >
+      <div class="mx-auto max-w-[1400px] px-4 md:px-6">
+        <div class="mb-8">
+          <p class="text-caption-mono mb-2" style="color: var(--color-mute);">Browse by category</p>
+          <h2 id="categories-heading" class="text-display-lg" style="color: var(--color-ink);">
+            Five categories, hundreds of tools.
+          </h2>
+        </div>
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-4">
+          {categories.map((cat) => (
+            <CategoryCard category={cat} />
+          ))}
+        </div>
+      </div>
+    </section>
+
+    <!-- ── Featured Tools ── -->
+    <section
+      class="py-16 md:py-20"
+      style="background-color: var(--color-canvas);"
+      aria-labelledby="featured-heading"
+    >
+      <div class="mx-auto max-w-[1400px] px-4 md:px-6">
+        <div class="flex items-end justify-between mb-8">
+          <div>
+            <p class="text-caption-mono mb-2" style="color: var(--color-mute);">Popular tools</p>
+            <h2 id="featured-heading" class="text-display-lg" style="color: var(--color-ink);">
+              Start with the essentials.
+            </h2>
+          </div>
+          <a
+            href="/text-tools"
+            class="hidden sm:inline-flex items-center gap-1 text-sm font-medium transition-opacity hover:opacity-70"
+            style="color: var(--color-link);"
+          >
+            View all
+            <span set:html={getIcon('arrow-right', 14)} />
+          </a>
+        </div>
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
+          {featuredTools.map((tool) => (
+            <ToolCard tool={tool} />
+          ))}
+        </div>
+      </div>
+    </section>
+
+    <!-- ── Why ToolHub ── -->
+    <section
+      class="py-16 md:py-20"
+      style="background-color: var(--color-canvas-soft);"
+      aria-labelledby="why-heading"
+    >
+      <div class="mx-auto max-w-[1400px] px-4 md:px-6">
+        <div class="mb-10 text-center">
+          <p class="text-caption-mono mb-2" style="color: var(--color-mute);">Why ToolHub</p>
+          <h2 id="why-heading" class="text-display-lg" style="color: var(--color-ink);">
+            Built for speed and simplicity.
+          </h2>
+        </div>
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+          {[
+            { icon: 'zap', title: 'Instant results.', desc: 'Every tool processes your input immediately. No waiting, no loading spinners.' },
+            { icon: 'lock', title: 'Private by design.', desc: 'All processing happens in your browser. Your data never leaves your device.' },
+            { icon: 'globe', title: 'Works offline.', desc: 'Once loaded, tools continue working even without an internet connection.' },
+            { icon: 'user', title: 'No account needed.', desc: 'Every tool is accessible immediately. No signup, no email, no friction.' },
+            { icon: 'sparkles', title: 'Clean interface.', desc: 'Focused, distraction-free tools that are easy to understand and use.' },
+            { icon: 'check-circle', title: 'Mobile friendly.', desc: 'Every tool is fully responsive and works great on any screen size.' },
+          ].map((feature) => (
+            <div
+              class="rounded-xl border p-6 shadow-card"
+              style="background-color: var(--color-canvas); border-color: var(--color-hairline);"
+            >
+              <span
+                class="flex h-9 w-9 items-center justify-center rounded-lg mb-4"
+                style="background-color: var(--color-canvas-soft-2); color: var(--color-ink);"
+                aria-hidden="true"
+              >
+                <span set:html={getIcon(feature.icon, 18)} />
+              </span>
+              <h3 class="text-display-sm mb-2" style="color: var(--color-ink);">{feature.title}</h3>
+              <p class="text-sm leading-relaxed" style="color: var(--color-mute);">{feature.desc}</p>
+            </div>
+          ))}
+        </div>
+      </div>
+    </section>
+
+    <!-- ── CTA Band ── -->
+    <section
+      class="py-16 md:py-20"
+      style="background-color: var(--color-ink);"
+      aria-labelledby="cta-heading"
+    >
+      <div class="mx-auto max-w-[1400px] px-4 md:px-6 text-center">
+        <h2 id="cta-heading" class="text-display-lg mb-4" style="color: #ffffff;">
+          Ready to get started?
+        </h2>
+        <p class="text-body-lg mb-8 max-w-md mx-auto" style="color: rgba(255,255,255,0.6);">
+          Pick a category and start using tools instantly. No account required.
+        </p>
+        <div class="flex flex-wrap items-center justify-center gap-3">
+          <a
+            href="/text-tools"
+            class="inline-flex items-center gap-2 rounded-full px-5 h-11 font-medium text-sm transition-opacity hover:opacity-90"
+            style="background-color: #ffffff; color: var(--color-ink);"
+          >
+            Browse All Tools
+            <span set:html={getIcon('arrow-right', 15)} />
+          </a>
+          <a
+            href="/developer-tools/json-formatter"
+            class="inline-flex items-center gap-2 rounded-full border px-5 h-11 font-medium text-sm"
+            style="border-color: rgba(255,255,255,0.2); color: rgba(255,255,255,0.8);"
+          >
+            JSON Formatter
+          </a>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <Footer />
+</BaseLayout>
+
+<style>
+  html.dark section[style*="var(--color-canvas)"] {
+    background-color: var(--color-dark-canvas) !important;
+  }
+  html.dark section[style*="var(--color-canvas-soft)"] {
+    background-color: var(--color-dark-canvas-soft) !important;
+  }
+  html.dark h1, html.dark h2, html.dark h3 {
+    color: var(--color-dark-ink) !important;
+  }
+  html.dark p {
+    color: var(--color-dark-body) !important;
+  }
+  html.dark div[style*="var(--color-canvas)"][style*="border"] {
+    background-color: var(--color-dark-canvas-soft) !important;
+    border-color: var(--color-dark-hairline) !important;
+  }
+  html.dark span[style*="var(--color-canvas-soft-2)"] {
+    background-color: var(--color-dark-canvas-soft-2) !important;
+    color: var(--color-dark-ink) !important;
+  }
+</style>

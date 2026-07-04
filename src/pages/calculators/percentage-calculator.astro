@@ -1,0 +1,149 @@
+---
+import ToolLayout from '../../layouts/ToolLayout.astro';
+import { getToolBySlug, getRelatedTools } from '../../data/tools';
+
+const tool = getToolBySlug('calculators', 'percentage-calculator')!;
+const relatedTools = getRelatedTools(tool, 4);
+
+const faqs = [
+  { question: 'How do I calculate a percentage of a number?', answer: 'Multiply the number by the percentage and divide by 100. For example, 20% of 150 = 150 × 20 / 100 = 30.' },
+  { question: 'How do I find what percentage one number is of another?', answer: 'Divide the first number by the second and multiply by 100. For example, 30 is what % of 150? = (30 / 150) × 100 = 20%.' },
+  { question: 'How do I calculate percentage change?', answer: 'Percentage change = ((New Value - Old Value) / Old Value) × 100. A positive result is an increase; negative is a decrease.' },
+];
+---
+
+<ToolLayout
+  tool={tool}
+  title="Percentage Calculator"
+  description="Calculate percentages, percentage of a number, percentage change and more. Free online percentage calculator — instant results, works in your browser."
+  faqs={faqs}
+  relatedTools={relatedTools}
+>
+  <div slot="tool" class="space-y-6 max-w-lg">
+    <!-- Tab selector -->
+    <div class="flex rounded-lg border overflow-hidden text-sm" style="border-color: var(--color-hairline);">
+      {[
+        { id: 'tab-of', label: '% of Number' },
+        { id: 'tab-what', label: 'What %?' },
+        { id: 'tab-change', label: '% Change' },
+      ].map((tab, i) => (
+        <button type="button" class="pct-tab flex-1 py-2.5 font-medium transition-colors" data-tab={tab.id} style={i === 0 ? 'background-color: var(--color-ink); color: #ffffff;' : 'background-color: var(--color-canvas); color: var(--color-body-text);'}>
+          {tab.label}
+        </button>
+      ))}
+    </div>
+
+    <!-- Panel: % of Number -->
+    <div id="tab-of" class="pct-panel space-y-4">
+      <div class="flex items-center gap-3 flex-wrap">
+        <input id="pct-of-pct" type="number" placeholder="20" class="rounded-lg border px-4 h-11 text-sm w-28 focus:outline-none focus:ring-2 focus:ring-[var(--color-link)]" style="background-color: var(--color-canvas); border-color: var(--color-hairline); color: var(--color-ink);" />
+        <span class="text-sm font-medium" style="color: var(--color-mute);">% of</span>
+        <input id="pct-of-num" type="number" placeholder="150" class="rounded-lg border px-4 h-11 text-sm w-28 focus:outline-none focus:ring-2 focus:ring-[var(--color-link)]" style="background-color: var(--color-canvas); border-color: var(--color-hairline); color: var(--color-ink);" />
+        <span class="text-sm font-medium" style="color: var(--color-mute);">= </span>
+        <span id="pct-of-result" class="text-display-sm font-mono" style="color: var(--color-ink);">—</span>
+      </div>
+    </div>
+
+    <!-- Panel: What % -->
+    <div id="tab-what" class="pct-panel hidden space-y-4">
+      <div class="flex items-center gap-3 flex-wrap">
+        <input id="pct-what-num" type="number" placeholder="30" class="rounded-lg border px-4 h-11 text-sm w-28 focus:outline-none focus:ring-2 focus:ring-[var(--color-link)]" style="background-color: var(--color-canvas); border-color: var(--color-hairline); color: var(--color-ink);" />
+        <span class="text-sm font-medium" style="color: var(--color-mute);">is what % of</span>
+        <input id="pct-what-of" type="number" placeholder="150" class="rounded-lg border px-4 h-11 text-sm w-28 focus:outline-none focus:ring-2 focus:ring-[var(--color-link)]" style="background-color: var(--color-canvas); border-color: var(--color-hairline); color: var(--color-ink);" />
+        <span class="text-sm font-medium" style="color: var(--color-mute);">= </span>
+        <span id="pct-what-result" class="text-display-sm font-mono" style="color: var(--color-ink);">—</span>
+      </div>
+    </div>
+
+    <!-- Panel: % Change -->
+    <div id="tab-change" class="pct-panel hidden space-y-4">
+      <div class="flex items-center gap-3 flex-wrap">
+        <div>
+          <label class="text-xs mb-1 block" style="color: var(--color-mute);">From</label>
+          <input id="pct-change-from" type="number" placeholder="100" class="rounded-lg border px-4 h-11 text-sm w-28 focus:outline-none focus:ring-2 focus:ring-[var(--color-link)]" style="background-color: var(--color-canvas); border-color: var(--color-hairline); color: var(--color-ink);" />
+        </div>
+        <div>
+          <label class="text-xs mb-1 block" style="color: var(--color-mute);">To</label>
+          <input id="pct-change-to" type="number" placeholder="120" class="rounded-lg border px-4 h-11 text-sm w-28 focus:outline-none focus:ring-2 focus:ring-[var(--color-link)]" style="background-color: var(--color-canvas); border-color: var(--color-hairline); color: var(--color-ink);" />
+        </div>
+        <div>
+          <label class="text-xs mb-1 block" style="color: var(--color-mute);">Change</label>
+          <span id="pct-change-result" class="text-display-sm font-mono block" style="color: var(--color-ink);">—</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div slot="content">
+    <section aria-labelledby="how-to-use">
+      <h2 id="how-to-use" class="text-display-sm mb-3" style="color: var(--color-ink);">How to use</h2>
+      <ol class="space-y-2 text-sm leading-relaxed" style="color: var(--color-body-text);">
+        <li>1. Select the type of percentage calculation you need.</li>
+        <li>2. Enter the values in the input fields.</li>
+        <li>3. The result updates instantly.</li>
+      </ol>
+    </section>
+  </div>
+</ToolLayout>
+
+<script>
+  const tabs = document.querySelectorAll('.pct-tab');
+  const panels = document.querySelectorAll('.pct-panel');
+
+  tabs.forEach(tab => {
+    tab.addEventListener('click', () => {
+      const id = (tab as HTMLElement).dataset.tab!;
+      tabs.forEach(t => {
+        (t as HTMLElement).style.backgroundColor = 'var(--color-canvas)';
+        (t as HTMLElement).style.color = 'var(--color-body-text)';
+      });
+      (tab as HTMLElement).style.backgroundColor = 'var(--color-ink)';
+      (tab as HTMLElement).style.color = '#ffffff';
+      panels.forEach(p => p.classList.add('hidden'));
+      document.getElementById(id)?.classList.remove('hidden');
+    });
+  });
+
+  function fmt(n: number): string {
+    return isNaN(n) || !isFinite(n) ? '—' : parseFloat(n.toFixed(4)).toString();
+  }
+
+  // % of number
+  const ofPct = document.getElementById('pct-of-pct') as HTMLInputElement;
+  const ofNum = document.getElementById('pct-of-num') as HTMLInputElement;
+  const ofResult = document.getElementById('pct-of-result')!;
+  [ofPct, ofNum].forEach(el => el.addEventListener('input', () => {
+    const p = parseFloat(ofPct.value), n = parseFloat(ofNum.value);
+    ofResult.textContent = fmt(n * p / 100);
+  }));
+
+  // What %
+  const whatNum = document.getElementById('pct-what-num') as HTMLInputElement;
+  const whatOf = document.getElementById('pct-what-of') as HTMLInputElement;
+  const whatResult = document.getElementById('pct-what-result')!;
+  [whatNum, whatOf].forEach(el => el.addEventListener('input', () => {
+    const n = parseFloat(whatNum.value), o = parseFloat(whatOf.value);
+    whatResult.textContent = fmt(n / o * 100) + (isNaN(n / o) ? '' : '%');
+  }));
+
+  // % change
+  const changeFrom = document.getElementById('pct-change-from') as HTMLInputElement;
+  const changeTo = document.getElementById('pct-change-to') as HTMLInputElement;
+  const changeResult = document.getElementById('pct-change-result')!;
+  [changeFrom, changeTo].forEach(el => el.addEventListener('input', () => {
+    const f = parseFloat(changeFrom.value), t = parseFloat(changeTo.value);
+    const change = (t - f) / f * 100;
+    if (isNaN(change) || !isFinite(change)) { changeResult.textContent = '—'; return; }
+    const sign = change >= 0 ? '+' : '';
+    changeResult.textContent = `${sign}${fmt(change)}%`;
+    changeResult.style.color = change >= 0 ? '#10b981' : 'var(--color-error)';
+  }));
+</script>
+
+<style>
+  html.dark input[type="number"] { background-color: var(--color-dark-canvas-soft) !important; border-color: var(--color-dark-hairline) !important; color: var(--color-dark-ink) !important; }
+  html.dark button[style*="var(--color-canvas)"] { background-color: var(--color-dark-canvas-soft) !important; border-color: var(--color-dark-hairline) !important; color: var(--color-dark-body) !important; }
+  html.dark span[style*="var(--color-ink)"] { color: var(--color-dark-ink) !important; }
+  html.dark span[style*="var(--color-mute)"] { color: var(--color-dark-mute) !important; }
+  html.dark label { color: var(--color-dark-mute) !important; }
+</style>

@@ -1,0 +1,115 @@
+---
+import ToolLayout from '../../layouts/ToolLayout.astro';
+import { getToolBySlug, getRelatedTools } from '../../data/tools';
+
+const tool = getToolBySlug('text-tools', 'reading-time-calculator')!;
+const relatedTools = getRelatedTools(tool, 4);
+
+const faqs = [
+  { question: 'What reading speed is used?', answer: 'The default is 200 words per minute (average adult reading speed). You can adjust this to match your own reading speed.' },
+  { question: 'Is this accurate?', answer: 'It is an estimate. Actual reading time varies based on text complexity, familiarity with the topic, and individual reading speed.' },
+  { question: 'Is my text uploaded anywhere?', answer: 'No. All processing happens locally in your browser.' },
+];
+---
+
+<ToolLayout
+  tool={tool}
+  title="Reading Time Calculator"
+  description="Estimate how long it takes to read any text. Adjust reading speed for accurate results. Free online reading time calculator — works in your browser."
+  faqs={faqs}
+  relatedTools={relatedTools}
+>
+  <div slot="tool" class="space-y-4">
+    <div>
+      <label for="rt-input" class="block text-sm font-medium mb-2" style="color: var(--color-ink);">Enter your text</label>
+      <textarea id="rt-input" rows="10" placeholder="Paste your article or text here..." class="w-full rounded-lg border px-4 py-3 text-sm resize-y focus:outline-none focus:ring-2 focus:ring-[var(--color-link)] focus:border-transparent" style="background-color: var(--color-canvas); border-color: var(--color-hairline); color: var(--color-ink); min-height: 200px;"></textarea>
+    </div>
+
+    <!-- Speed control -->
+    <div class="flex items-center gap-4 flex-wrap">
+      <label class="text-sm font-medium" style="color: var(--color-ink);">Reading speed:</label>
+      <div class="flex items-center gap-2">
+        <input id="rt-speed" type="number" min="50" max="1000" value="200" class="rounded-md border px-3 h-8 text-sm w-24" style="background-color: var(--color-canvas); border-color: var(--color-hairline); color: var(--color-ink);" />
+        <span class="text-sm" style="color: var(--color-mute);">words/min</span>
+      </div>
+      <div class="flex gap-1">
+        {[{ label: 'Slow', wpm: 150 }, { label: 'Average', wpm: 200 }, { label: 'Fast', wpm: 300 }].map(p => (
+          <button type="button" class="rt-preset rounded-full border px-3 h-7 text-xs font-medium" data-wpm={p.wpm} style="border-color: var(--color-hairline); color: var(--color-body-text); background-color: var(--color-canvas);">{p.label}</button>
+        ))}
+      </div>
+    </div>
+
+    <!-- Results -->
+    <div class="grid grid-cols-2 sm:grid-cols-4 gap-3" aria-live="polite">
+      {[
+        { id: 'rt-time', label: 'Reading Time', value: '0 min' },
+        { id: 'rt-words', label: 'Words', value: '0' },
+        { id: 'rt-chars', label: 'Characters', value: '0' },
+        { id: 'rt-sentences', label: 'Sentences', value: '0' },
+      ].map(stat => (
+        <div class="rounded-lg border p-4 text-center shadow-card" style="background-color: var(--color-canvas); border-color: var(--color-hairline);">
+          <p id={stat.id} class="text-display-sm tabular-nums" style="color: var(--color-ink);">{stat.value}</p>
+          <p class="text-caption mt-1" style="color: var(--color-mute);">{stat.label}</p>
+        </div>
+      ))}
+    </div>
+  </div>
+
+  <div slot="content">
+    <section aria-labelledby="how-to-use">
+      <h2 id="how-to-use" class="text-display-sm mb-3" style="color: var(--color-ink);">How to use</h2>
+      <ol class="space-y-2 text-sm leading-relaxed" style="color: var(--color-body-text);">
+        <li>1. Paste your text into the input area.</li>
+        <li>2. Adjust the reading speed if needed.</li>
+        <li>3. Reading time and statistics update instantly.</li>
+      </ol>
+    </section>
+  </div>
+</ToolLayout>
+
+<script>
+  const textarea = document.getElementById('rt-input') as HTMLTextAreaElement;
+  const speedInput = document.getElementById('rt-speed') as HTMLInputElement;
+  const rtTime = document.getElementById('rt-time')!;
+  const rtWords = document.getElementById('rt-words')!;
+  const rtChars = document.getElementById('rt-chars')!;
+  const rtSentences = document.getElementById('rt-sentences')!;
+
+  function update() {
+    const text = textarea.value;
+    const wpm = parseInt(speedInput.value, 10) || 200;
+    const words = text.trim() === '' ? 0 : text.trim().split(/\s+/).length;
+    const chars = text.length;
+    const sentences = text.trim() === '' ? 0 : (text.match(/[^.!?]*[.!?]+/g) ?? [text]).length;
+    const minutes = words / wpm;
+    let timeStr = '< 1 min';
+    if (minutes >= 1) {
+      const m = Math.floor(minutes);
+      const s = Math.round((minutes - m) * 60);
+      timeStr = s > 0 ? `${m}m ${s}s` : `${m} min`;
+    }
+    rtTime.textContent = timeStr;
+    rtWords.textContent = words.toLocaleString();
+    rtChars.textContent = chars.toLocaleString();
+    rtSentences.textContent = sentences.toLocaleString();
+  }
+
+  textarea.addEventListener('input', update);
+  speedInput.addEventListener('input', update);
+
+  document.querySelectorAll('.rt-preset').forEach(btn => {
+    btn.addEventListener('click', () => {
+      speedInput.value = (btn as HTMLElement).dataset.wpm ?? '200';
+      update();
+    });
+  });
+</script>
+
+<style>
+  html.dark textarea { background-color: var(--color-dark-canvas-soft) !important; border-color: var(--color-dark-hairline) !important; color: var(--color-dark-ink) !important; }
+  html.dark input[type="number"] { background-color: var(--color-dark-canvas-soft) !important; border-color: var(--color-dark-hairline) !important; color: var(--color-dark-ink) !important; }
+  html.dark button { background-color: var(--color-dark-canvas-soft) !important; border-color: var(--color-dark-hairline) !important; color: var(--color-dark-body) !important; }
+  html.dark div[style*="var(--color-canvas)"][style*="border"] { background-color: var(--color-dark-canvas-soft) !important; border-color: var(--color-dark-hairline) !important; }
+  html.dark p[style*="var(--color-ink)"] { color: var(--color-dark-ink) !important; }
+  html.dark p[style*="var(--color-mute)"] { color: var(--color-dark-mute) !important; }
+</style>

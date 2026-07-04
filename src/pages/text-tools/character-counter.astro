@@ -1,0 +1,93 @@
+---
+import ToolLayout from '../../layouts/ToolLayout.astro';
+import { getToolBySlug, getRelatedTools } from '../../data/tools';
+
+const tool = getToolBySlug('text-tools', 'character-counter')!;
+const relatedTools = getRelatedTools(tool, 4);
+
+const faqs = [
+  { question: 'What is the difference between characters and characters without spaces?', answer: 'Characters counts every character including spaces, tabs and newlines. Characters without spaces counts only non-whitespace characters.' },
+  { question: 'Is my text uploaded anywhere?', answer: 'No. All processing happens locally in your browser.' },
+  { question: 'Does it count newlines?', answer: 'Yes. Newlines count as characters in the total character count but not in the "no spaces" count.' },
+];
+---
+
+<ToolLayout
+  tool={tool}
+  title="Character Counter"
+  description="Count characters with and without spaces in any text instantly. Free online character counter — works entirely in your browser, no signup required."
+  faqs={faqs}
+  relatedTools={relatedTools}
+>
+  <div slot="tool" class="space-y-4">
+    <div>
+      <label for="char-input" class="block text-sm font-medium mb-2" style="color: var(--color-ink);">Enter your text</label>
+      <textarea id="char-input" rows="10" placeholder="Start typing or paste your text here..." class="w-full rounded-lg border px-4 py-3 text-sm resize-y transition-colors focus:outline-none focus:ring-2 focus:ring-[var(--color-link)] focus:border-transparent" style="background-color: var(--color-canvas); border-color: var(--color-hairline); color: var(--color-ink); min-height: 200px;" aria-describedby="char-stats"></textarea>
+    </div>
+
+    <div id="char-stats" class="grid grid-cols-2 sm:grid-cols-4 gap-3" aria-live="polite">
+      {[
+        { id: 'stat-total', label: 'Characters', value: '0' },
+        { id: 'stat-no-spaces', label: 'No Spaces', value: '0' },
+        { id: 'stat-letters', label: 'Letters', value: '0' },
+        { id: 'stat-digits', label: 'Digits', value: '0' },
+      ].map(stat => (
+        <div class="rounded-lg border p-4 text-center shadow-card" style="background-color: var(--color-canvas); border-color: var(--color-hairline);">
+          <p id={stat.id} class="text-display-md tabular-nums" style="color: var(--color-ink);">{stat.value}</p>
+          <p class="text-caption mt-1" style="color: var(--color-mute);">{stat.label}</p>
+        </div>
+      ))}
+    </div>
+
+    <div class="flex gap-2">
+      <button id="btn-copy-char" type="button" class="inline-flex items-center gap-2 rounded-full border px-4 h-9 text-sm font-medium" style="border-color: var(--color-hairline); color: var(--color-body-text); background-color: var(--color-canvas);">Copy Text</button>
+      <button id="btn-clear-char" type="button" class="inline-flex items-center gap-2 rounded-full border px-4 h-9 text-sm font-medium" style="border-color: var(--color-hairline); color: var(--color-body-text); background-color: var(--color-canvas);">Clear</button>
+    </div>
+  </div>
+
+  <div slot="content">
+    <section aria-labelledby="how-to-use">
+      <h2 id="how-to-use" class="text-display-sm mb-3" style="color: var(--color-ink);">How to use</h2>
+      <ol class="space-y-2 text-sm leading-relaxed" style="color: var(--color-body-text);">
+        <li>1. Type or paste your text into the input area.</li>
+        <li>2. Character counts update instantly as you type.</li>
+        <li>3. Use Copy to copy your text or Clear to reset.</li>
+      </ol>
+    </section>
+  </div>
+</ToolLayout>
+
+<script>
+  const textarea = document.getElementById('char-input') as HTMLTextAreaElement;
+  const statTotal = document.getElementById('stat-total')!;
+  const statNoSpaces = document.getElementById('stat-no-spaces')!;
+  const statLetters = document.getElementById('stat-letters')!;
+  const statDigits = document.getElementById('stat-digits')!;
+  const btnCopy = document.getElementById('btn-copy-char')!;
+  const btnClear = document.getElementById('btn-clear-char')!;
+
+  function update() {
+    const text = textarea.value;
+    statTotal.textContent = text.length.toLocaleString();
+    statNoSpaces.textContent = text.replace(/\s/g, '').length.toLocaleString();
+    statLetters.textContent = (text.match(/[a-zA-Z]/g) ?? []).length.toLocaleString();
+    statDigits.textContent = (text.match(/[0-9]/g) ?? []).length.toLocaleString();
+  }
+
+  textarea.addEventListener('input', update);
+  btnCopy.addEventListener('click', async () => {
+    if (!textarea.value) return;
+    await navigator.clipboard.writeText(textarea.value).catch(() => {});
+    const orig = btnCopy.textContent; btnCopy.textContent = 'Copied!';
+    setTimeout(() => { btnCopy.textContent = orig; }, 2000);
+  });
+  btnClear.addEventListener('click', () => { textarea.value = ''; update(); textarea.focus(); });
+</script>
+
+<style>
+  html.dark textarea { background-color: var(--color-dark-canvas-soft) !important; border-color: var(--color-dark-hairline) !important; color: var(--color-dark-ink) !important; }
+  html.dark div[style*="var(--color-canvas)"][style*="border"] { background-color: var(--color-dark-canvas-soft) !important; border-color: var(--color-dark-hairline) !important; }
+  html.dark p[style*="var(--color-ink)"] { color: var(--color-dark-ink) !important; }
+  html.dark p[style*="var(--color-mute)"] { color: var(--color-dark-mute) !important; }
+  html.dark button { background-color: var(--color-dark-canvas-soft) !important; border-color: var(--color-dark-hairline) !important; color: var(--color-dark-body) !important; }
+</style>

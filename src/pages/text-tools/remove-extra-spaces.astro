@@ -1,0 +1,98 @@
+---
+import ToolLayout from '../../layouts/ToolLayout.astro';
+import { getToolBySlug, getRelatedTools } from '../../data/tools';
+
+const tool = getToolBySlug('text-tools', 'remove-extra-spaces')!;
+const relatedTools = getRelatedTools(tool, 4);
+
+const faqs = [
+  { question: 'What counts as extra spaces?', answer: 'Multiple consecutive spaces, leading spaces, and trailing spaces on each line are all considered extra spaces.' },
+  { question: 'Does it remove newlines?', answer: 'No. Line breaks are preserved. Only horizontal whitespace within lines is collapsed.' },
+  { question: 'Is my text uploaded anywhere?', answer: 'No. All processing happens locally in your browser.' },
+];
+---
+
+<ToolLayout
+  tool={tool}
+  title="Remove Extra Spaces"
+  description="Clean up extra whitespace and spaces from your text instantly. Collapse multiple spaces, trim leading and trailing spaces. Free online tool."
+  faqs={faqs}
+  relatedTools={relatedTools}
+>
+  <div slot="tool" class="space-y-4">
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-4">
+      <div>
+        <label for="spaces-input" class="block text-sm font-medium mb-2" style="color: var(--color-ink);">Input text</label>
+        <textarea id="spaces-input" rows="10" placeholder="Paste text with extra spaces here..." class="w-full rounded-lg border px-4 py-3 text-sm font-mono resize-y focus:outline-none focus:ring-2 focus:ring-[var(--color-link)] focus:border-transparent" style="background-color: var(--color-canvas); border-color: var(--color-hairline); color: var(--color-ink); min-height: 200px;"></textarea>
+      </div>
+      <div>
+        <label for="spaces-output" class="block text-sm font-medium mb-2" style="color: var(--color-ink);">Cleaned text</label>
+        <textarea id="spaces-output" rows="10" readonly placeholder="Result will appear here..." class="w-full rounded-lg border px-4 py-3 text-sm font-mono resize-y" style="background-color: var(--color-canvas-soft-2); border-color: var(--color-hairline); color: var(--color-ink); min-height: 200px; cursor: default;" aria-live="polite"></textarea>
+      </div>
+    </div>
+    <div class="flex flex-wrap items-center gap-4">
+      <label class="flex items-center gap-2 text-sm cursor-pointer" style="color: var(--color-body-text);">
+        <input type="checkbox" id="opt-trim" checked class="accent-[var(--color-ink)]" />
+        Trim line edges
+      </label>
+      <label class="flex items-center gap-2 text-sm cursor-pointer" style="color: var(--color-body-text);">
+        <input type="checkbox" id="opt-collapse-newlines" class="accent-[var(--color-ink)]" />
+        Collapse blank lines
+      </label>
+      <div class="flex gap-2 ml-auto">
+        <button id="btn-copy-spaces" type="button" class="inline-flex items-center gap-2 rounded-full border px-4 h-9 text-sm font-medium" style="border-color: var(--color-hairline); color: var(--color-body-text); background-color: var(--color-canvas);">Copy</button>
+        <button id="btn-clear-spaces" type="button" class="inline-flex items-center gap-2 rounded-full border px-4 h-9 text-sm font-medium" style="border-color: var(--color-hairline); color: var(--color-body-text); background-color: var(--color-canvas);">Clear</button>
+      </div>
+    </div>
+  </div>
+  <div slot="content">
+    <section aria-labelledby="how-to-use">
+      <h2 id="how-to-use" class="text-display-sm mb-3" style="color: var(--color-ink);">How to use</h2>
+      <ol class="space-y-2 text-sm leading-relaxed" style="color: var(--color-body-text);">
+        <li>1. Paste your text into the input area.</li>
+        <li>2. Extra spaces are removed instantly.</li>
+        <li>3. Toggle options to control trimming and blank line collapsing.</li>
+        <li>4. Click Copy to copy the cleaned text.</li>
+      </ol>
+    </section>
+  </div>
+</ToolLayout>
+
+<script>
+  const input = document.getElementById('spaces-input') as HTMLTextAreaElement;
+  const output = document.getElementById('spaces-output') as HTMLTextAreaElement;
+  const optTrim = document.getElementById('opt-trim') as HTMLInputElement;
+  const optNewlines = document.getElementById('opt-collapse-newlines') as HTMLInputElement;
+  const btnCopy = document.getElementById('btn-copy-spaces')!;
+  const btnClear = document.getElementById('btn-clear-spaces')!;
+
+  function process() {
+    let text = input.value;
+    const lines = text.split('\n').map(line => {
+      let l = line.replace(/\s+/g, ' ');
+      if (optTrim.checked) l = l.trim();
+      return l;
+    });
+    let result = lines.join('\n');
+    if (optNewlines.checked) result = result.replace(/\n{3,}/g, '\n\n');
+    output.value = result;
+  }
+
+  input.addEventListener('input', process);
+  optTrim.addEventListener('change', process);
+  optNewlines.addEventListener('change', process);
+
+  btnCopy.addEventListener('click', async () => {
+    if (!output.value) return;
+    await navigator.clipboard.writeText(output.value).catch(() => {});
+    const orig = btnCopy.textContent; btnCopy.textContent = 'Copied!';
+    setTimeout(() => { btnCopy.textContent = orig; }, 2000);
+  });
+  btnClear.addEventListener('click', () => { input.value = ''; output.value = ''; input.focus(); });
+</script>
+<style>
+  html.dark textarea { background-color: var(--color-dark-canvas-soft) !important; border-color: var(--color-dark-hairline) !important; color: var(--color-dark-ink) !important; }
+  html.dark textarea[readonly] { background-color: var(--color-dark-canvas-soft-2) !important; }
+  html.dark button { background-color: var(--color-dark-canvas-soft) !important; border-color: var(--color-dark-hairline) !important; color: var(--color-dark-body) !important; }
+  html.dark label { color: var(--color-dark-body) !important; }
+</style>

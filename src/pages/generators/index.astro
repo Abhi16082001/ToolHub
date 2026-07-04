@@ -1,0 +1,11 @@
+---
+import CategoryLayout from '../../layouts/CategoryLayout.astro';
+import { getCategoryBySlug } from '../../data/tools';
+
+const category = getCategoryBySlug('generators')!;
+---
+
+<CategoryLayout
+  category={category}
+  description="Free online generators for passwords, UUIDs, lorem ipsum, QR codes and more. All generators run entirely in your browser — no data is sent to any server."
+/>

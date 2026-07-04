@@ -1,0 +1,74 @@
+---
+import { getIcon } from '../utils/icons';
+import type { Category } from '../types/tool';
+
+interface Props {
+  category: Category;
+}
+
+const { category } = Astro.props;
+const toolCount = category.tools.length;
+---
+
+<a
+  href={`/${category.slug}`}
+  class="group flex flex-col gap-4 rounded-xl border p-6 transition-all duration-150 hover:-translate-y-0.5 shadow-card hover:shadow-card-md"
+  style="background-color: var(--color-canvas); border-color: var(--color-hairline); text-decoration: none;"
+>
+  <!-- Icon -->
+  <div class="flex items-center justify-between">
+    <span
+      class="flex h-10 w-10 items-center justify-center rounded-lg"
+      style="background-color: var(--color-canvas-soft-2); color: var(--color-ink);"
+      aria-hidden="true"
+    >
+      <span set:html={getIcon(category.icon, 20)} />
+    </span>
+    <span
+      class="text-caption rounded-full px-2 py-0.5"
+      style="background-color: var(--color-canvas-soft-2); color: var(--color-mute);"
+    >
+      {toolCount} tools
+    </span>
+  </div>
+
+  <!-- Content -->
+  <div>
+    <h3
+      class="text-display-sm mb-1 transition-colors group-hover:text-[var(--color-link)]"
+      style="color: var(--color-ink);"
+    >
+      {category.name}
+    </h3>
+    <p class="text-sm leading-relaxed" style="color: var(--color-mute);">
+      {category.description}
+    </p>
+  </div>
+
+  <!-- CTA -->
+  <div class="flex items-center gap-1 text-sm font-medium mt-auto" style="color: var(--color-link);">
+    Browse tools
+    <span set:html={getIcon('arrow-right', 14)} />
+  </div>
+</a>
+
+<style>
+  html.dark a {
+    background-color: var(--color-dark-canvas-soft) !important;
+    border-color: var(--color-dark-hairline) !important;
+  }
+  html.dark a span:first-child span {
+    background-color: var(--color-dark-canvas-soft-2) !important;
+    color: var(--color-dark-ink) !important;
+  }
+  html.dark a h3 {
+    color: var(--color-dark-ink) !important;
+  }
+  html.dark a p {
+    color: var(--color-dark-mute) !important;
+  }
+  html.dark a .text-caption {
+    background-color: var(--color-dark-canvas-soft-2) !important;
+    color: var(--color-dark-mute) !important;
+  }
+</style>

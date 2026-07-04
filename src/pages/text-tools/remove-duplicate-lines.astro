@@ -1,0 +1,107 @@
+---
+import ToolLayout from '../../layouts/ToolLayout.astro';
+import { getToolBySlug, getRelatedTools } from '../../data/tools';
+
+const tool = getToolBySlug('text-tools', 'remove-duplicate-lines')!;
+const relatedTools = getRelatedTools(tool, 4);
+
+const faqs = [
+  { question: 'Is the comparison case-sensitive?', answer: 'By default yes, but you can toggle case-insensitive mode to treat "Hello" and "hello" as duplicates.' },
+  { question: 'Does it preserve the original order?', answer: 'Yes. The first occurrence of each line is kept; subsequent duplicates are removed.' },
+  { question: 'Is my text uploaded anywhere?', answer: 'No. All processing happens locally in your browser.' },
+];
+---
+
+<ToolLayout
+  tool={tool}
+  title="Remove Duplicate Lines"
+  description="Remove duplicate lines from any text instantly. Keep only unique lines while preserving the original order. Free online tool — works in your browser."
+  faqs={faqs}
+  relatedTools={relatedTools}
+>
+  <div slot="tool" class="space-y-4">
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-4">
+      <div>
+        <label for="dedup-input" class="block text-sm font-medium mb-2" style="color: var(--color-ink);">Input text</label>
+        <textarea id="dedup-input" rows="12" placeholder="Paste text with duplicate lines here..." class="w-full rounded-lg border px-4 py-3 text-sm font-mono resize-y focus:outline-none focus:ring-2 focus:ring-[var(--color-link)] focus:border-transparent" style="background-color: var(--color-canvas); border-color: var(--color-hairline); color: var(--color-ink); min-height: 240px;"></textarea>
+      </div>
+      <div>
+        <div class="flex items-center justify-between mb-2">
+          <label for="dedup-output" class="block text-sm font-medium" style="color: var(--color-ink);">Result</label>
+          <span id="dedup-stats" class="text-caption" style="color: var(--color-mute);"></span>
+        </div>
+        <textarea id="dedup-output" rows="12" readonly placeholder="Unique lines will appear here..." class="w-full rounded-lg border px-4 py-3 text-sm font-mono resize-y" style="background-color: var(--color-canvas-soft-2); border-color: var(--color-hairline); color: var(--color-ink); min-height: 240px; cursor: default;" aria-live="polite"></textarea>
+      </div>
+    </div>
+    <div class="flex flex-wrap items-center gap-4">
+      <label class="flex items-center gap-2 text-sm cursor-pointer" style="color: var(--color-body-text);">
+        <input type="checkbox" id="opt-case-insensitive" class="accent-[var(--color-ink)]" />
+        Case-insensitive
+      </label>
+      <label class="flex items-center gap-2 text-sm cursor-pointer" style="color: var(--color-body-text);">
+        <input type="checkbox" id="opt-trim-lines" checked class="accent-[var(--color-ink)]" />
+        Trim whitespace
+      </label>
+      <div class="flex gap-2 ml-auto">
+        <button id="btn-copy-dedup" type="button" class="inline-flex items-center gap-2 rounded-full border px-4 h-9 text-sm font-medium" style="border-color: var(--color-hairline); color: var(--color-body-text); background-color: var(--color-canvas);">Copy</button>
+        <button id="btn-clear-dedup" type="button" class="inline-flex items-center gap-2 rounded-full border px-4 h-9 text-sm font-medium" style="border-color: var(--color-hairline); color: var(--color-body-text); background-color: var(--color-canvas);">Clear</button>
+      </div>
+    </div>
+  </div>
+  <div slot="content">
+    <section aria-labelledby="how-to-use">
+      <h2 id="how-to-use" class="text-display-sm mb-3" style="color: var(--color-ink);">How to use</h2>
+      <ol class="space-y-2 text-sm leading-relaxed" style="color: var(--color-body-text);">
+        <li>1. Paste your text into the input area.</li>
+        <li>2. Duplicate lines are removed instantly.</li>
+        <li>3. Toggle options to adjust case sensitivity or whitespace trimming.</li>
+        <li>4. Click Copy to copy the result.</li>
+      </ol>
+    </section>
+  </div>
+</ToolLayout>
+
+<script>
+  const input = document.getElementById('dedup-input') as HTMLTextAreaElement;
+  const output = document.getElementById('dedup-output') as HTMLTextAreaElement;
+  const stats = document.getElementById('dedup-stats')!;
+  const optCase = document.getElementById('opt-case-insensitive') as HTMLInputElement;
+  const optTrim = document.getElementById('opt-trim-lines') as HTMLInputElement;
+  const btnCopy = document.getElementById('btn-copy-dedup')!;
+  const btnClear = document.getElementById('btn-clear-dedup')!;
+
+  function process() {
+    const text = input.value;
+    const lines = text.split('\n');
+    const seen = new Set<string>();
+    const result: string[] = [];
+    let removed = 0;
+    for (const line of lines) {
+      const key = optTrim.checked
+        ? (optCase.checked ? line.trim().toLowerCase() : line.trim())
+        : (optCase.checked ? line.toLowerCase() : line);
+      if (!seen.has(key)) { seen.add(key); result.push(line); }
+      else removed++;
+    }
+    output.value = result.join('\n');
+    stats.textContent = removed > 0 ? `${removed} duplicate${removed === 1 ? '' : 's'} removed` : '';
+  }
+
+  input.addEventListener('input', process);
+  optCase.addEventListener('change', process);
+  optTrim.addEventListener('change', process);
+
+  btnCopy.addEventListener('click', async () => {
+    if (!output.value) return;
+    await navigator.clipboard.writeText(output.value).catch(() => {});
+    const orig = btnCopy.textContent; btnCopy.textContent = 'Copied!';
+    setTimeout(() => { btnCopy.textContent = orig; }, 2000);
+  });
+  btnClear.addEventListener('click', () => { input.value = ''; output.value = ''; stats.textContent = ''; input.focus(); });
+</script>
+<style>
+  html.dark textarea { background-color: var(--color-dark-canvas-soft) !important; border-color: var(--color-dark-hairline) !important; color: var(--color-dark-ink) !important; }
+  html.dark textarea[readonly] { background-color: var(--color-dark-canvas-soft-2) !important; }
+  html.dark button { background-color: var(--color-dark-canvas-soft) !important; border-color: var(--color-dark-hairline) !important; color: var(--color-dark-body) !important; }
+  html.dark label { color: var(--color-dark-body) !important; }
+</style>

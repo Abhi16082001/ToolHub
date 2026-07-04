@@ -1,0 +1,132 @@
+---
+import ToolLayout from '../../layouts/ToolLayout.astro';
+import { getToolBySlug, getRelatedTools } from '../../data/tools';
+
+const tool = getToolBySlug('developer-tools', 'uuid-generator')!;
+const relatedTools = getRelatedTools(tool, 4);
+
+const faqs = [
+  { question: 'What is a UUID?', answer: 'A UUID (Universally Unique Identifier) is a 128-bit label used to uniquely identify information in computer systems. Version 4 UUIDs are randomly generated.' },
+  { question: 'Are these UUIDs truly unique?', answer: 'UUID v4 uses cryptographically secure random numbers. The probability of generating a duplicate is astronomically low — effectively zero for practical purposes.' },
+  { question: 'Is this tool secure?', answer: 'Yes. UUIDs are generated using the Web Crypto API (crypto.randomUUID or crypto.getRandomValues), which provides cryptographically secure randomness.' },
+];
+---
+
+<ToolLayout
+  tool={tool}
+  title="UUID Generator"
+  description="Generate random UUID v4 identifiers instantly. Bulk generate multiple UUIDs. Free online UUID generator — uses the Web Crypto API for secure randomness."
+  faqs={faqs}
+  relatedTools={relatedTools}
+>
+  <div slot="tool" class="space-y-4 max-w-xl">
+    <!-- Single UUID -->
+    <div>
+      <label class="block text-sm font-medium mb-2" style="color: var(--color-ink);">Generated UUID</label>
+      <div class="flex items-center gap-2">
+        <code id="uuid-display" class="flex-1 rounded-lg border px-4 py-3 text-sm font-mono break-all" style="background-color: var(--color-canvas-soft-2); border-color: var(--color-hairline); color: var(--color-ink);" aria-live="polite">
+          Click Generate to create a UUID
+        </code>
+        <button id="btn-copy-uuid" type="button" class="shrink-0 rounded-lg border px-3 h-12 text-sm font-medium" style="border-color: var(--color-hairline); color: var(--color-body-text); background-color: var(--color-canvas);">Copy</button>
+      </div>
+    </div>
+
+    <button id="btn-generate-uuid" type="button" class="w-full rounded-full h-11 font-medium text-sm" style="background-color: var(--color-ink); color: #ffffff;">
+      Generate UUID
+    </button>
+
+    <!-- Bulk -->
+    <details class="rounded-lg border" style="border-color: var(--color-hairline);">
+      <summary class="px-4 py-3 text-sm font-medium cursor-pointer list-none" style="color: var(--color-ink);">Generate multiple UUIDs</summary>
+      <div class="px-4 pb-4 space-y-3">
+        <div class="flex items-center gap-3">
+          <label for="uuid-count" class="text-sm shrink-0" style="color: var(--color-body-text);">Count:</label>
+          <input id="uuid-count" type="number" min="1" max="100" value="10" class="rounded-md border px-3 h-8 text-sm w-20" style="background-color: var(--color-canvas); border-color: var(--color-hairline); color: var(--color-ink);" />
+          <button id="btn-bulk-uuid" type="button" class="rounded-full border px-4 h-8 text-sm font-medium" style="border-color: var(--color-hairline); color: var(--color-body-text); background-color: var(--color-canvas);">Generate</button>
+          <button id="btn-copy-bulk-uuid" type="button" class="rounded-full border px-4 h-8 text-sm font-medium" style="border-color: var(--color-hairline); color: var(--color-body-text); background-color: var(--color-canvas);">Copy All</button>
+        </div>
+        <textarea id="uuid-bulk-output" rows="8" readonly class="w-full rounded-lg border px-3 py-2 text-sm font-mono" style="background-color: var(--color-canvas-soft-2); border-color: var(--color-hairline); color: var(--color-ink);" aria-live="polite"></textarea>
+      </div>
+    </details>
+
+    <!-- Format options -->
+    <div class="flex flex-wrap gap-3">
+      <label class="flex items-center gap-2 text-sm cursor-pointer" style="color: var(--color-body-text);">
+        <input type="checkbox" id="opt-uppercase-uuid" class="accent-[var(--color-ink)]" />
+        Uppercase
+      </label>
+      <label class="flex items-center gap-2 text-sm cursor-pointer" style="color: var(--color-body-text);">
+        <input type="checkbox" id="opt-no-hyphens" class="accent-[var(--color-ink)]" />
+        No hyphens
+      </label>
+    </div>
+  </div>
+
+  <div slot="content">
+    <section aria-labelledby="how-to-use">
+      <h2 id="how-to-use" class="text-display-sm mb-3" style="color: var(--color-ink);">How to use</h2>
+      <ol class="space-y-2 text-sm leading-relaxed" style="color: var(--color-body-text);">
+        <li>1. Click <strong>Generate UUID</strong> to create a new UUID v4.</li>
+        <li>2. Click <strong>Copy</strong> to copy it to your clipboard.</li>
+        <li>3. Use the bulk section to generate multiple UUIDs at once.</li>
+      </ol>
+    </section>
+  </div>
+</ToolLayout>
+
+<script>
+  const display = document.getElementById('uuid-display')!;
+  const btnGenerate = document.getElementById('btn-generate-uuid')!;
+  const btnCopy = document.getElementById('btn-copy-uuid')!;
+  const btnBulk = document.getElementById('btn-bulk-uuid')!;
+  const btnCopyBulk = document.getElementById('btn-copy-bulk-uuid')!;
+  const bulkOutput = document.getElementById('uuid-bulk-output') as HTMLTextAreaElement;
+  const countInput = document.getElementById('uuid-count') as HTMLInputElement;
+  const optUpper = document.getElementById('opt-uppercase-uuid') as HTMLInputElement;
+  const optNoHyphens = document.getElementById('opt-no-hyphens') as HTMLInputElement;
+
+  function generateUUID(): string {
+    let uuid = crypto.randomUUID();
+    if (optNoHyphens.checked) uuid = uuid.replace(/-/g, '');
+    if (optUpper.checked) uuid = uuid.toUpperCase();
+    return uuid;
+  }
+
+  function generate() {
+    display.textContent = generateUUID();
+  }
+
+  btnGenerate.addEventListener('click', generate);
+
+  btnCopy.addEventListener('click', async () => {
+    const text = display.textContent ?? '';
+    if (!text || text.includes('Click Generate')) return;
+    await navigator.clipboard.writeText(text).catch(() => {});
+    const orig = btnCopy.textContent; btnCopy.textContent = 'Copied!';
+    setTimeout(() => { btnCopy.textContent = orig; }, 2000);
+  });
+
+  btnBulk.addEventListener('click', () => {
+    const count = Math.min(100, Math.max(1, parseInt(countInput.value, 10) || 10));
+    bulkOutput.value = Array.from({ length: count }, generateUUID).join('\n');
+  });
+
+  btnCopyBulk.addEventListener('click', async () => {
+    if (!bulkOutput.value) return;
+    await navigator.clipboard.writeText(bulkOutput.value).catch(() => {});
+    const orig = btnCopyBulk.textContent; btnCopyBulk.textContent = 'Copied!';
+    setTimeout(() => { btnCopyBulk.textContent = orig; }, 2000);
+  });
+
+  generate();
+</script>
+
+<style>
+  html.dark code { background-color: var(--color-dark-canvas-soft-2) !important; border-color: var(--color-dark-hairline) !important; color: var(--color-dark-ink) !important; }
+  html.dark button[style*="var(--color-canvas)"] { background-color: var(--color-dark-canvas-soft) !important; border-color: var(--color-dark-hairline) !important; color: var(--color-dark-body) !important; }
+  html.dark details { border-color: var(--color-dark-hairline) !important; }
+  html.dark summary { color: var(--color-dark-ink) !important; }
+  html.dark textarea { background-color: var(--color-dark-canvas-soft-2) !important; border-color: var(--color-dark-hairline) !important; color: var(--color-dark-ink) !important; }
+  html.dark input[type="number"] { background-color: var(--color-dark-canvas-soft) !important; border-color: var(--color-dark-hairline) !important; color: var(--color-dark-ink) !important; }
+  html.dark label { color: var(--color-dark-body) !important; }
+</style>

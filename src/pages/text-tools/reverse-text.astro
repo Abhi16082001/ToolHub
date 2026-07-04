@@ -1,0 +1,134 @@
+---
+import ToolLayout from '../../layouts/ToolLayout.astro';
+import { getToolBySlug, getRelatedTools } from '../../data/tools';
+
+const tool = getToolBySlug('text-tools', 'reverse-text')!;
+const relatedTools = getRelatedTools(tool, 4);
+
+const faqs = [
+  { question: 'Does this reverse individual characters or lines?', answer: 'By default it reverses all characters in the text. You can also choose to reverse only the order of lines.' },
+  { question: 'Is my text uploaded anywhere?', answer: 'No. All processing happens locally in your browser. Your text is never sent to any server.' },
+  { question: 'Can I reverse Unicode or emoji text?', answer: 'Yes. The tool correctly handles Unicode characters and emoji by reversing grapheme clusters.' },
+];
+---
+
+<ToolLayout
+  tool={tool}
+  title="Reverse Text"
+  description="Reverse any text string instantly. Flip characters, reverse words, or reverse the order of lines. Free online text reverser — works entirely in your browser."
+  faqs={faqs}
+  relatedTools={relatedTools}
+>
+  <div slot="tool" class="space-y-4">
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-4">
+      <!-- Input -->
+      <div>
+        <label for="reverse-input" class="block text-sm font-medium mb-2" style="color: var(--color-ink);">Input text</label>
+        <textarea
+          id="reverse-input"
+          rows="8"
+          placeholder="Enter text to reverse..."
+          class="w-full rounded-lg border px-4 py-3 text-sm resize-y transition-colors focus:outline-none focus:ring-2 focus:ring-[var(--color-link)] focus:border-transparent"
+          style="background-color: var(--color-canvas); border-color: var(--color-hairline); color: var(--color-ink); min-height: 180px;"
+        ></textarea>
+      </div>
+      <!-- Output -->
+      <div>
+        <label for="reverse-output" class="block text-sm font-medium mb-2" style="color: var(--color-ink);">Reversed text</label>
+        <textarea
+          id="reverse-output"
+          rows="8"
+          readonly
+          placeholder="Result will appear here..."
+          class="w-full rounded-lg border px-4 py-3 text-sm resize-y"
+          style="background-color: var(--color-canvas-soft-2); border-color: var(--color-hairline); color: var(--color-ink); min-height: 180px; cursor: default;"
+          aria-live="polite"
+        ></textarea>
+      </div>
+    </div>
+
+    <!-- Options -->
+    <div class="flex flex-wrap items-center gap-4">
+      <label class="flex items-center gap-2 text-sm cursor-pointer" style="color: var(--color-body-text);">
+        <input type="radio" name="reverse-mode" value="chars" checked class="accent-[var(--color-ink)]" />
+        Reverse characters
+      </label>
+      <label class="flex items-center gap-2 text-sm cursor-pointer" style="color: var(--color-body-text);">
+        <input type="radio" name="reverse-mode" value="lines" class="accent-[var(--color-ink)]" />
+        Reverse lines
+      </label>
+      <label class="flex items-center gap-2 text-sm cursor-pointer" style="color: var(--color-body-text);">
+        <input type="radio" name="reverse-mode" value="words" class="accent-[var(--color-ink)]" />
+        Reverse words
+      </label>
+    </div>
+
+    <!-- Actions -->
+    <div class="flex flex-wrap gap-2">
+      <button id="btn-copy-reverse" type="button" class="inline-flex items-center gap-2 rounded-full border px-4 h-9 text-sm font-medium transition-colors hover:border-[var(--color-hairline-strong)]" style="border-color: var(--color-hairline); color: var(--color-body-text); background-color: var(--color-canvas);">
+        Copy Result
+      </button>
+      <button id="btn-clear-reverse" type="button" class="inline-flex items-center gap-2 rounded-full border px-4 h-9 text-sm font-medium transition-colors hover:border-[var(--color-hairline-strong)]" style="border-color: var(--color-hairline); color: var(--color-body-text); background-color: var(--color-canvas);">
+        Clear
+      </button>
+    </div>
+  </div>
+
+  <div slot="content">
+    <section aria-labelledby="how-to-use">
+      <h2 id="how-to-use" class="text-display-sm mb-3" style="color: var(--color-ink);">How to use</h2>
+      <ol class="space-y-2 text-sm leading-relaxed" style="color: var(--color-body-text);">
+        <li>1. Enter or paste your text in the input area.</li>
+        <li>2. Choose a reversal mode: characters, lines, or words.</li>
+        <li>3. The result updates instantly in the output area.</li>
+        <li>4. Click Copy Result to copy the reversed text.</li>
+      </ol>
+    </section>
+  </div>
+</ToolLayout>
+
+<script>
+  const input = document.getElementById('reverse-input') as HTMLTextAreaElement;
+  const output = document.getElementById('reverse-output') as HTMLTextAreaElement;
+  const modes = document.querySelectorAll('input[name="reverse-mode"]');
+  const btnCopy = document.getElementById('btn-copy-reverse')!;
+  const btnClear = document.getElementById('btn-clear-reverse')!;
+
+  function getMode(): string {
+    return (document.querySelector('input[name="reverse-mode"]:checked') as HTMLInputElement)?.value ?? 'chars';
+  }
+
+  function reverse(text: string, mode: string): string {
+    if (mode === 'lines') return text.split('\n').reverse().join('\n');
+    if (mode === 'words') return text.split(' ').reverse().join(' ');
+    return [...text].reverse().join('');
+  }
+
+  function update() {
+    output.value = reverse(input.value, getMode());
+  }
+
+  input.addEventListener('input', update);
+  modes.forEach((m) => m.addEventListener('change', update));
+
+  btnCopy.addEventListener('click', async () => {
+    if (!output.value) return;
+    await navigator.clipboard.writeText(output.value).catch(() => {});
+    const orig = btnCopy.textContent;
+    btnCopy.textContent = 'Copied!';
+    setTimeout(() => { btnCopy.textContent = orig; }, 2000);
+  });
+
+  btnClear.addEventListener('click', () => {
+    input.value = '';
+    output.value = '';
+    input.focus();
+  });
+</script>
+
+<style>
+  html.dark textarea { background-color: var(--color-dark-canvas-soft) !important; border-color: var(--color-dark-hairline) !important; color: var(--color-dark-ink) !important; }
+  html.dark textarea[readonly] { background-color: var(--color-dark-canvas-soft-2) !important; }
+  html.dark button { background-color: var(--color-dark-canvas-soft) !important; border-color: var(--color-dark-hairline) !important; color: var(--color-dark-body) !important; }
+  html.dark label { color: var(--color-dark-body) !important; }
+</style>

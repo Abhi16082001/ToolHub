@@ -1,0 +1,11 @@
+---
+import CategoryLayout from '../../layouts/CategoryLayout.astro';
+import { getCategoryBySlug } from '../../data/tools';
+
+const category = getCategoryBySlug('text-tools')!;
+---
+
+<CategoryLayout
+  category={category}
+  description="Free online text tools for editing, formatting, cleaning and analyzing text. Word counters, case converters, text cleaners and more — all running in your browser."
+/>

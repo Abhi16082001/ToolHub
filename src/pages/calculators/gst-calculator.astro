@@ -1,0 +1,176 @@
+---
+import ToolLayout from '../../layouts/ToolLayout.astro';
+import { getToolBySlug, getRelatedTools } from '../../data/tools';
+
+const tool = getToolBySlug('calculators', 'gst-calculator')!;
+const relatedTools = getRelatedTools(tool, 4);
+
+const faqs = [
+  { question: 'What is GST?', answer: 'GST (Goods and Services Tax) is a value-added tax levied on most goods and services sold for domestic consumption. The rate varies by country and product category.' },
+  { question: 'How is GST calculated?', answer: 'To add GST: GST Amount = Original Price × (GST Rate / 100). Total = Original Price + GST Amount. To remove GST: Original Price = Total / (1 + GST Rate / 100).' },
+  { question: 'Can I calculate GST for any rate?', answer: 'Yes. You can enter any GST rate percentage. Common rates include 5%, 12%, 18%, and 28%.' },
+  { question: 'Is this calculator accurate?', answer: 'Yes. The calculations use standard GST formulas. Results are rounded to 2 decimal places.' },
+];
+---
+
+<ToolLayout
+  tool={tool}
+  title="GST Calculator"
+  description="Calculate GST amounts, totals and original prices instantly. Supports any GST rate. Free online GST calculator — works entirely in your browser."
+  faqs={faqs}
+  relatedTools={relatedTools}
+>
+  <div slot="tool" class="max-w-lg space-y-6">
+    <!-- Mode -->
+    <div class="flex rounded-lg border overflow-hidden" style="border-color: var(--color-hairline);">
+      <button id="mode-add" type="button" class="flex-1 py-2.5 text-sm font-medium transition-colors" style="background-color: var(--color-ink); color: #ffffff;" aria-pressed="true">
+        Add GST
+      </button>
+      <button id="mode-remove" type="button" class="flex-1 py-2.5 text-sm font-medium transition-colors" style="background-color: var(--color-canvas); color: var(--color-body-text);" aria-pressed="false">
+        Remove GST
+      </button>
+    </div>
+
+    <!-- Inputs -->
+    <div class="space-y-4">
+      <div>
+        <label for="gst-amount" class="block text-sm font-medium mb-1.5" style="color: var(--color-ink);">
+          <span id="amount-label">Original price (excl. GST)</span>
+        </label>
+        <div class="relative">
+          <span class="absolute left-3 top-1/2 -translate-y-1/2 text-sm" style="color: var(--color-mute);">₹</span>
+          <input id="gst-amount" type="number" min="0" step="0.01" placeholder="0.00" class="w-full rounded-lg border pl-7 pr-4 h-11 text-sm focus:outline-none focus:ring-2 focus:ring-[var(--color-link)] focus:border-transparent" style="background-color: var(--color-canvas); border-color: var(--color-hairline); color: var(--color-ink);" />
+        </div>
+      </div>
+
+      <div>
+        <label for="gst-rate" class="block text-sm font-medium mb-1.5" style="color: var(--color-ink);">GST Rate (%)</label>
+        <div class="flex gap-2">
+          <input id="gst-rate" type="number" min="0" max="100" step="0.01" value="18" class="flex-1 rounded-lg border px-4 h-11 text-sm focus:outline-none focus:ring-2 focus:ring-[var(--color-link)] focus:border-transparent" style="background-color: var(--color-canvas); border-color: var(--color-hairline); color: var(--color-ink);" />
+          <div class="flex gap-1">
+            {[5, 12, 18, 28].map(rate => (
+              <button type="button" class="gst-preset rounded-md border px-2.5 h-11 text-xs font-medium transition-colors hover:border-[var(--color-hairline-strong)]" data-rate={rate} style="border-color: var(--color-hairline); color: var(--color-body-text); background-color: var(--color-canvas);">{rate}%</button>
+            ))}
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Results -->
+    <div class="rounded-xl border overflow-hidden" style="border-color: var(--color-hairline);">
+      <div class="px-4 py-2 text-caption-mono" style="background-color: var(--color-canvas-soft-2); color: var(--color-mute);">Results</div>
+      <div class="divide-y" style="border-color: var(--color-hairline);">
+        {[
+          { id: 'res-original', label: 'Original Price' },
+          { id: 'res-gst', label: 'GST Amount' },
+          { id: 'res-total', label: 'Total Price', bold: true },
+        ].map(row => (
+          <div class="flex items-center justify-between px-4 py-3">
+            <span class="text-sm" style={`color: var(--color-body-text); ${row.bold ? 'font-medium;' : ''}`}>{row.label}</span>
+            <span id={row.id} class="text-sm font-mono" style={`color: ${row.bold ? 'var(--color-ink)' : 'var(--color-body-text)'}; ${row.bold ? 'font-semibold;' : ''}`}>₹0.00</span>
+          </div>
+        ))}
+      </div>
+    </div>
+
+    <button id="btn-reset-gst" type="button" class="rounded-full border px-4 h-9 text-sm font-medium" style="border-color: var(--color-hairline); color: var(--color-body-text); background-color: var(--color-canvas);">Reset</button>
+  </div>
+
+  <div slot="content">
+    <section aria-labelledby="formula-section">
+      <h2 id="formula-section" class="text-display-sm mb-3" style="color: var(--color-ink);">GST Formula</h2>
+      <div class="rounded-lg border overflow-hidden text-sm" style="border-color: var(--color-hairline);">
+        <div class="px-4 py-3 border-b" style="border-color: var(--color-hairline); background-color: var(--color-canvas-soft-2);">
+          <p style="color: var(--color-body-text);"><strong style="color: var(--color-ink);">Add GST:</strong> Total = Price × (1 + Rate/100)</p>
+        </div>
+        <div class="px-4 py-3">
+          <p style="color: var(--color-body-text);"><strong style="color: var(--color-ink);">Remove GST:</strong> Original = Total / (1 + Rate/100)</p>
+        </div>
+      </div>
+    </section>
+  </div>
+</ToolLayout>
+
+<script>
+  const amountInput = document.getElementById('gst-amount') as HTMLInputElement;
+  const rateInput = document.getElementById('gst-rate') as HTMLInputElement;
+  const modeAdd = document.getElementById('mode-add')!;
+  const modeRemove = document.getElementById('mode-remove')!;
+  const amountLabel = document.getElementById('amount-label')!;
+  const resOriginal = document.getElementById('res-original')!;
+  const resGst = document.getElementById('res-gst')!;
+  const resTotal = document.getElementById('res-total')!;
+  const btnReset = document.getElementById('btn-reset-gst')!;
+  const presets = document.querySelectorAll('.gst-preset');
+
+  let mode: 'add' | 'remove' = 'add';
+
+  function fmt(n: number): string {
+    return '₹' + n.toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+  }
+
+  function calculate() {
+    const amount = parseFloat(amountInput.value) || 0;
+    const rate = parseFloat(rateInput.value) || 0;
+    if (mode === 'add') {
+      const gst = amount * (rate / 100);
+      const total = amount + gst;
+      resOriginal.textContent = fmt(amount);
+      resGst.textContent = fmt(gst);
+      resTotal.textContent = fmt(total);
+    } else {
+      const original = amount / (1 + rate / 100);
+      const gst = amount - original;
+      resOriginal.textContent = fmt(original);
+      resGst.textContent = fmt(gst);
+      resTotal.textContent = fmt(amount);
+    }
+  }
+
+  function setMode(m: 'add' | 'remove') {
+    mode = m;
+    if (m === 'add') {
+      modeAdd.style.backgroundColor = 'var(--color-ink)';
+      modeAdd.style.color = '#ffffff';
+      modeRemove.style.backgroundColor = 'var(--color-canvas)';
+      modeRemove.style.color = 'var(--color-body-text)';
+      amountLabel.textContent = 'Original price (excl. GST)';
+    } else {
+      modeRemove.style.backgroundColor = 'var(--color-ink)';
+      modeRemove.style.color = '#ffffff';
+      modeAdd.style.backgroundColor = 'var(--color-canvas)';
+      modeAdd.style.color = 'var(--color-body-text)';
+      amountLabel.textContent = 'Total price (incl. GST)';
+    }
+    calculate();
+  }
+
+  modeAdd.addEventListener('click', () => setMode('add'));
+  modeRemove.addEventListener('click', () => setMode('remove'));
+  amountInput.addEventListener('input', calculate);
+  rateInput.addEventListener('input', calculate);
+
+  presets.forEach(btn => {
+    btn.addEventListener('click', () => {
+      rateInput.value = (btn as HTMLElement).dataset.rate ?? '18';
+      calculate();
+    });
+  });
+
+  btnReset.addEventListener('click', () => {
+    amountInput.value = '';
+    rateInput.value = '18';
+    resOriginal.textContent = '₹0.00';
+    resGst.textContent = '₹0.00';
+    resTotal.textContent = '₹0.00';
+  });
+</script>
+
+<style>
+  html.dark input[type="number"] { background-color: var(--color-dark-canvas-soft) !important; border-color: var(--color-dark-hairline) !important; color: var(--color-dark-ink) !important; }
+  html.dark button[style*="var(--color-canvas)"] { background-color: var(--color-dark-canvas-soft) !important; border-color: var(--color-dark-hairline) !important; color: var(--color-dark-body) !important; }
+  html.dark div[style*="var(--color-canvas-soft-2)"] { background-color: var(--color-dark-canvas-soft-2) !important; }
+  html.dark div[style*="var(--color-hairline)"] { border-color: var(--color-dark-hairline) !important; }
+  html.dark span[style*="var(--color-body-text)"] { color: var(--color-dark-body) !important; }
+  html.dark span[style*="var(--color-ink)"] { color: var(--color-dark-ink) !important; }
+</style>

@@ -1,0 +1,232 @@
+---
+import ToolLayout from '../../layouts/ToolLayout.astro';
+import { getToolBySlug, getRelatedTools } from '../../data/tools';
+
+const tool = getToolBySlug('text-tools', 'word-counter')!;
+const relatedTools = getRelatedTools(tool, 4);
+
+const faqs = [
+  {
+    question: 'What counts as a word?',
+    answer: 'A word is any sequence of characters separated by whitespace (spaces, tabs, or newlines). Hyphenated words like "well-known" count as one word.',
+  },
+  {
+    question: 'Does this tool work offline?',
+    answer: 'Yes. Once the page is loaded, the word counter works entirely in your browser without any internet connection.',
+  },
+  {
+    question: 'Is my text uploaded anywhere?',
+    answer: 'No. All processing happens locally in your browser. Your text is never sent to any server.',
+  },
+  {
+    question: 'What is the character limit?',
+    answer: 'There is no enforced character limit. The tool can handle very large texts, though extremely large inputs may slow down your browser.',
+  },
+  {
+    question: 'How is reading time calculated?',
+    answer: 'Reading time is estimated at 200 words per minute, which is the average adult reading speed.',
+  },
+];
+---
+
+<ToolLayout
+  tool={tool}
+  title="Word Counter"
+  description="Count words, characters, sentences and paragraphs in any text instantly. Free online word counter — no signup, no upload, works in your browser."
+  faqs={faqs}
+  relatedTools={relatedTools}
+>
+  <!-- Tool Interface -->
+  <div slot="tool" class="space-y-4">
+    <!-- Input -->
+    <div>
+      <label for="word-counter-input" class="block text-sm font-medium mb-2" style="color: var(--color-ink);">
+        Enter your text
+      </label>
+      <textarea
+        id="word-counter-input"
+        rows="10"
+        placeholder="Start typing or paste your text here..."
+        class="w-full rounded-lg border px-4 py-3 text-sm font-mono resize-y transition-colors focus:outline-none focus:ring-2 focus:ring-[var(--color-link)] focus:border-transparent"
+        style="background-color: var(--color-canvas); border-color: var(--color-hairline); color: var(--color-ink); min-height: 200px;"
+        aria-describedby="word-counter-stats"
+      ></textarea>
+    </div>
+
+    <!-- Stats Grid -->
+    <div
+      id="word-counter-stats"
+      class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3"
+      aria-live="polite"
+      aria-label="Text statistics"
+    >
+      {[
+        { id: 'stat-words', label: 'Words', value: '0' },
+        { id: 'stat-chars', label: 'Characters', value: '0' },
+        { id: 'stat-chars-no-spaces', label: 'No Spaces', value: '0' },
+        { id: 'stat-sentences', label: 'Sentences', value: '0' },
+        { id: 'stat-paragraphs', label: 'Paragraphs', value: '0' },
+        { id: 'stat-reading-time', label: 'Read Time', value: '0 min' },
+      ].map((stat) => (
+        <div
+          class="rounded-lg border p-4 text-center shadow-card"
+          style="background-color: var(--color-canvas); border-color: var(--color-hairline);"
+        >
+          <p
+            id={stat.id}
+            class="text-display-md tabular-nums"
+            style="color: var(--color-ink);"
+          >
+            {stat.value}
+          </p>
+          <p class="text-caption mt-1" style="color: var(--color-mute);">{stat.label}</p>
+        </div>
+      ))}
+    </div>
+
+    <!-- Actions -->
+    <div class="flex flex-wrap gap-2">
+      <button
+        id="btn-copy"
+        type="button"
+        class="inline-flex items-center gap-2 rounded-full border px-4 h-9 text-sm font-medium transition-colors hover:border-[var(--color-hairline-strong)]"
+        style="border-color: var(--color-hairline); color: var(--color-body-text); background-color: var(--color-canvas);"
+      >
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+        Copy Text
+      </button>
+      <button
+        id="btn-clear"
+        type="button"
+        class="inline-flex items-center gap-2 rounded-full border px-4 h-9 text-sm font-medium transition-colors hover:border-[var(--color-hairline-strong)]"
+        style="border-color: var(--color-hairline); color: var(--color-body-text); background-color: var(--color-canvas);"
+      >
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>
+        Clear
+      </button>
+    </div>
+  </div>
+
+  <!-- Supporting Content -->
+  <div slot="content" class="space-y-8 mt-8">
+    <section aria-labelledby="how-to-use">
+      <h2 id="how-to-use" class="text-display-sm mb-3" style="color: var(--color-ink);">How to use the Word Counter</h2>
+      <ol class="space-y-2 text-sm leading-relaxed" style="color: var(--color-body-text);">
+        <li>1. Type or paste your text into the input area above.</li>
+        <li>2. Statistics update instantly as you type.</li>
+        <li>3. Use the Copy button to copy your text, or Clear to reset.</li>
+      </ol>
+    </section>
+
+    <section aria-labelledby="example-section">
+      <h2 id="example-section" class="text-display-sm mb-3" style="color: var(--color-ink);">Example</h2>
+      <div class="rounded-lg border overflow-hidden" style="border-color: var(--color-hairline);">
+        <div class="px-4 py-2 border-b text-caption-mono" style="border-color: var(--color-hairline); background-color: var(--color-canvas-soft-2); color: var(--color-mute);">Input</div>
+        <p class="px-4 py-3 text-sm font-mono" style="color: var(--color-body-text);">Hello World. This is a sample text.</p>
+        <div class="px-4 py-2 border-t border-b text-caption-mono" style="border-color: var(--color-hairline); background-color: var(--color-canvas-soft-2); color: var(--color-mute);">Output</div>
+        <div class="px-4 py-3 grid grid-cols-3 gap-4 text-sm" style="color: var(--color-body-text);">
+          <div><span class="font-medium" style="color: var(--color-ink);">7</span> Words</div>
+          <div><span class="font-medium" style="color: var(--color-ink);">35</span> Characters</div>
+          <div><span class="font-medium" style="color: var(--color-ink);">2</span> Sentences</div>
+        </div>
+      </div>
+    </section>
+  </div>
+</ToolLayout>
+
+<script>
+  const textarea = document.getElementById('word-counter-input') as HTMLTextAreaElement;
+  const statWords = document.getElementById('stat-words')!;
+  const statChars = document.getElementById('stat-chars')!;
+  const statCharsNoSpaces = document.getElementById('stat-chars-no-spaces')!;
+  const statSentences = document.getElementById('stat-sentences')!;
+  const statParagraphs = document.getElementById('stat-paragraphs')!;
+  const statReadingTime = document.getElementById('stat-reading-time')!;
+  const btnCopy = document.getElementById('btn-copy')!;
+  const btnClear = document.getElementById('btn-clear')!;
+
+  function countWords(text: string): number {
+    return text.trim() === '' ? 0 : text.trim().split(/\s+/).length;
+  }
+
+  function countSentences(text: string): number {
+    if (text.trim() === '') return 0;
+    const matches = text.match(/[^.!?]*[.!?]+/g);
+    return matches ? matches.length : (text.trim().length > 0 ? 1 : 0);
+  }
+
+  function countParagraphs(text: string): number {
+    if (text.trim() === '') return 0;
+    return text.split(/\n\s*\n/).filter((p) => p.trim().length > 0).length;
+  }
+
+  function formatReadingTime(words: number): string {
+    const minutes = Math.ceil(words / 200);
+    if (minutes < 1) return '< 1 min';
+    return `${minutes} min`;
+  }
+
+  function update() {
+    const text = textarea.value;
+    const words = countWords(text);
+    const chars = text.length;
+    const charsNoSpaces = text.replace(/\s/g, '').length;
+    const sentences = countSentences(text);
+    const paragraphs = countParagraphs(text);
+    const readingTime = formatReadingTime(words);
+
+    statWords.textContent = words.toLocaleString();
+    statChars.textContent = chars.toLocaleString();
+    statCharsNoSpaces.textContent = charsNoSpaces.toLocaleString();
+    statSentences.textContent = sentences.toLocaleString();
+    statParagraphs.textContent = paragraphs.toLocaleString();
+    statReadingTime.textContent = readingTime;
+  }
+
+  textarea.addEventListener('input', update);
+
+  btnCopy.addEventListener('click', async () => {
+    if (!textarea.value) return;
+    try {
+      await navigator.clipboard.writeText(textarea.value);
+      const original = btnCopy.innerHTML;
+      btnCopy.innerHTML = `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg> Copied!`;
+      setTimeout(() => { btnCopy.innerHTML = original; }, 2000);
+    } catch {}
+  });
+
+  btnClear.addEventListener('click', () => {
+    textarea.value = '';
+    update();
+    textarea.focus();
+  });
+</script>
+
+<style>
+  html.dark textarea {
+    background-color: var(--color-dark-canvas-soft) !important;
+    border-color: var(--color-dark-hairline) !important;
+    color: var(--color-dark-ink) !important;
+  }
+  html.dark div[style*="var(--color-canvas)"][style*="border"] {
+    background-color: var(--color-dark-canvas-soft) !important;
+    border-color: var(--color-dark-hairline) !important;
+  }
+  html.dark p[style*="var(--color-ink)"] {
+    color: var(--color-dark-ink) !important;
+  }
+  html.dark p[style*="var(--color-mute)"] {
+    color: var(--color-dark-mute) !important;
+  }
+  html.dark button {
+    background-color: var(--color-dark-canvas-soft) !important;
+    border-color: var(--color-dark-hairline) !important;
+    color: var(--color-dark-body) !important;
+  }
+  html.dark div[style*="var(--color-canvas-soft-2)"] {
+    background-color: var(--color-dark-canvas-soft-2) !important;
+  }
+  html.dark div[style*="var(--color-hairline)"] {
+    border-color: var(--color-dark-hairline) !important;
+  }
+</style>
