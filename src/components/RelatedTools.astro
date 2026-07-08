@@ -11,14 +11,17 @@ const { tools, title = 'Related Tools' } = Astro.props;
 if (tools.length === 0) return;
 ---
 
-<section class="mt-12" aria-labelledby="related-tools-heading">
-  <h2
-    id="related-tools-heading"
-    class="text-display-sm mb-4"
-    style="color: var(--color-ink);"
-  >
-    {title}
-  </h2>
+<section class="related-tools mt-12 rounded-2xl border p-4 sm:p-5" style="background-color: color-mix(in srgb, var(--color-canvas) 88%, var(--color-primary-soft)); border-color: var(--color-hairline);" aria-labelledby="related-tools-heading">
+  <div class="mb-4 flex items-center justify-between gap-3">
+    <h2
+      id="related-tools-heading"
+      class="text-display-sm"
+      style="color: var(--color-ink);"
+    >
+      {title}
+    </h2>
+    <span class="hidden sm:block h-2 w-16 rounded-full" style="background: linear-gradient(90deg, var(--color-primary), var(--color-teal));" aria-hidden="true"></span>
+  </div>
   <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
     {tools.map((tool) => (
       <ToolCard tool={tool} size="sm" />
@@ -27,7 +30,11 @@ if (tools.length === 0) return;
 </section>
 
 <style>
-  html.dark h2 {
+  html.dark .related-tools {
+    background-color: color-mix(in srgb, var(--color-dark-canvas-soft) 82%, var(--color-dark-primary-soft)) !important;
+    border-color: var(--color-dark-hairline) !important;
+  }
+  html.dark .related-tools h2 {
     color: var(--color-dark-ink) !important;
   }
 </style>

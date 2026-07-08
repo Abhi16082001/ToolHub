@@ -25,7 +25,7 @@ const schema = {
 };
 ---
 
-<section class="mt-12" aria-labelledby="faq-heading">
+<section class="faq-section mt-12" aria-labelledby="faq-heading">
   <h2
     id="faq-heading"
     class="text-display-sm mb-6"
@@ -34,10 +34,11 @@ const schema = {
     {title}
   </h2>
 
-  <div class="flex flex-col divide-y" style="border-color: var(--color-hairline);">
-    {items.map((item, i) => (
+  <div class="faq-list flex flex-col gap-2">
+    {items.map((item) => (
       <details
-        class="group py-4"
+        class="faq-item group rounded-xl border px-4 py-3 transition-colors duration-150"
+        style="background-color: var(--color-canvas); border-color: var(--color-hairline);"
         name="faq"
       >
         <summary
@@ -46,11 +47,11 @@ const schema = {
         >
           <span>{item.question}</span>
           <span
-            class="shrink-0 transition-transform duration-200 group-open:rotate-180"
-            style="color: var(--color-mute);"
+            class="faq-icon shrink-0 transition-transform duration-200 group-open:rotate-180"
+            style="color: var(--color-primary); transform-box: fill-box; transform-origin: center;"
             aria-hidden="true"
           >
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
               <polyline points="6 9 12 15 18 9"/>
             </svg>
           </span>
@@ -66,16 +67,30 @@ const schema = {
 <script type="application/ld+json" set:html={JSON.stringify(schema)} />
 
 <style>
-  html.dark h2 {
+  .faq-item:hover,
+  .faq-item[open] {
+    border-color: var(--color-primary-soft-strong) !important;
+    background-color: color-mix(in srgb, var(--color-canvas) 88%, var(--color-primary-soft)) !important;
+  }
+  html.dark .faq-section h2 {
     color: var(--color-dark-ink) !important;
   }
-  html.dark details {
+  html.dark .faq-item {
+    background-color: var(--color-dark-canvas-soft) !important;
     border-color: var(--color-dark-hairline) !important;
   }
-  html.dark summary {
+  html.dark .faq-item:hover,
+  html.dark .faq-item[open] {
+    background-color: color-mix(in srgb, var(--color-dark-canvas-soft) 82%, var(--color-dark-primary-soft)) !important;
+    border-color: var(--color-dark-hairline-strong) !important;
+  }
+  html.dark .faq-item summary {
     color: var(--color-dark-ink) !important;
   }
-  html.dark details p {
+  html.dark .faq-item p {
     color: var(--color-dark-body) !important;
+  }
+  html.dark .faq-icon {
+    color: var(--color-dark-primary) !important;
   }
 </style>

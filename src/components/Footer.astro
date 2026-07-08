@@ -9,7 +9,7 @@ const columns = [
       { label: 'Character Counter', href: '/text-tools/character-counter' },
       { label: 'Reverse Text', href: '/text-tools/reverse-text' },
       { label: 'Slug Generator', href: '/text-tools/slug-generator' },
-      { label: 'All Text Tools →', href: '/text-tools' },
+      { label: 'All Text Tools', href: '/text-tools' },
     ],
   },
   {
@@ -19,7 +19,7 @@ const columns = [
       { label: 'Base64 Encoder', href: '/developer-tools/base64-encoder-decoder' },
       { label: 'UUID Generator', href: '/developer-tools/uuid-generator' },
       { label: 'Regex Tester', href: '/developer-tools/regex-tester' },
-      { label: 'All Developer Tools →', href: '/developer-tools' },
+      { label: 'All Developer Tools', href: '/developer-tools' },
     ],
   },
   {
@@ -29,7 +29,7 @@ const columns = [
       { label: 'Temperature Converter', href: '/converter-tools/temperature-converter' },
       { label: 'Color Converter', href: '/converter-tools/color-converter' },
       { label: 'Number Base Converter', href: '/converter-tools/number-base-converter' },
-      { label: 'All Converters →', href: '/converter-tools' },
+      { label: 'All Converters', href: '/converter-tools' },
     ],
   },
   {
@@ -39,47 +39,46 @@ const columns = [
       { label: 'Percentage Calculator', href: '/calculators/percentage-calculator' },
       { label: 'Password Generator', href: '/generators/password-generator' },
       { label: 'QR Code Generator', href: '/generators/qr-code-generator' },
-      { label: 'All Generators →', href: '/generators' },
+      { label: 'All Generators', href: '/generators' },
     ],
   },
 ];
 ---
 
 <footer
-  class="border-t mt-auto"
-  style="background-color: var(--color-canvas); border-color: var(--color-hairline);"
+  class="site-footer border-t mt-auto"
+  style="background: linear-gradient(180deg, var(--color-canvas), var(--color-canvas-soft)); border-color: var(--color-hairline);"
 >
   <div class="mx-auto max-w-[1400px] px-4 md:px-6 py-16">
-    <!-- Top: Logo + columns -->
     <div class="grid grid-cols-2 md:grid-cols-5 gap-8 mb-12">
-      <!-- Brand -->
       <div class="col-span-2 md:col-span-1">
         <a
           href="/"
-          class="flex items-center gap-2 font-semibold text-base mb-3 w-fit"
+          class="footer-logo flex items-center gap-2 font-semibold text-base mb-3 w-fit transition-opacity duration-150 hover:opacity-90"
           style="color: var(--color-ink);"
+          aria-label="ToolHub Home"
         >
           <span
-            class="flex h-7 w-7 items-center justify-center rounded-md text-white text-sm font-bold"
-            style="background-color: var(--color-ink);"
+            class="flex h-8 w-8 items-center justify-center rounded-lg text-white text-sm font-semibold shadow-card"
+            style="background: linear-gradient(135deg, var(--color-primary), var(--color-teal));"
+            aria-hidden="true"
           >T</span>
           ToolHub
         </a>
-        <p class="text-sm leading-relaxed max-w-[200px]" style="color: var(--color-mute);">
+        <p class="text-sm leading-relaxed max-w-[220px]" style="color: var(--color-mute);">
           Free online utility tools. No signup. No backend. Works in your browser.
         </p>
       </div>
 
-      <!-- Link Columns -->
       {columns.map((col) => (
         <div>
-          <p class="text-caption-mono mb-3" style="color: var(--color-mute);">{col.label}</p>
+          <p class="text-caption-mono mb-3" style="color: var(--color-primary);">{col.label}</p>
           <ul class="flex flex-col gap-2">
             {col.links.map((link) => (
               <li>
                 <a
                   href={link.href}
-                  class="text-sm transition-colors hover:opacity-80"
+                  class="footer-link text-sm transition-colors duration-150 hover:text-[var(--color-primary)]"
                   style="color: var(--color-body-text);"
                 >
                   {link.label}
@@ -91,32 +90,42 @@ const columns = [
       ))}
     </div>
 
-    <!-- Bottom bar -->
     <div
       class="flex flex-col sm:flex-row items-center justify-between gap-3 pt-8 border-t"
       style="border-color: var(--color-hairline);"
     >
       <p class="text-caption" style="color: var(--color-mute);">
-        © {year} ToolHub. All tools run locally in your browser.
+        &copy; {year} ToolHub. All tools run locally in your browser.
       </p>
       <div class="flex items-center gap-4">
-        <a href="/privacy" class="text-caption transition-colors hover:opacity-80" style="color: var(--color-mute);">Privacy</a>
-        <a href="/sitemap.xml" class="text-caption transition-colors hover:opacity-80" style="color: var(--color-mute);">Sitemap</a>
+        <a href="/privacy" class="footer-link text-caption transition-colors duration-150 hover:text-[var(--color-primary)]" style="color: var(--color-mute);">Privacy</a>
+        <a href="/sitemap.xml" class="footer-link text-caption transition-colors duration-150 hover:text-[var(--color-primary)]" style="color: var(--color-mute);">Sitemap</a>
       </div>
     </div>
   </div>
 </footer>
 
 <style>
-  html.dark footer {
-    background-color: var(--color-dark-canvas) !important;
+  html.dark .site-footer {
+    background: linear-gradient(180deg, var(--color-dark-canvas), var(--color-dark-canvas-soft)) !important;
     border-color: var(--color-dark-hairline) !important;
   }
-  html.dark footer a,
-  html.dark footer p {
+  html.dark .footer-logo {
+    color: var(--color-dark-ink) !important;
+  }
+  html.dark .site-footer p {
+    color: var(--color-dark-mute) !important;
+  }
+  html.dark .site-footer .text-caption-mono {
+    color: var(--color-dark-primary) !important;
+  }
+  html.dark .footer-link {
     color: var(--color-dark-body) !important;
   }
-  html.dark footer .border-t {
+  html.dark .footer-link:hover {
+    color: var(--color-dark-primary) !important;
+  }
+  html.dark .site-footer .border-t {
     border-color: var(--color-dark-hairline) !important;
   }
 </style>

@@ -12,30 +12,28 @@ const toolCount = category.tools.length;
 
 <a
   href={`/${category.slug}`}
-  class="group flex flex-col gap-4 rounded-xl border p-6 transition-all duration-150 hover:-translate-y-0.5 shadow-card hover:shadow-card-md"
-  style="background-color: var(--color-canvas); border-color: var(--color-hairline); text-decoration: none;"
+  class="category-card group flex flex-col gap-4 rounded-xl border p-6 transition-[transform,box-shadow,border-color,background-color] duration-150 hover:-translate-y-0.5 shadow-card hover:shadow-card-md"
+  style="background: linear-gradient(180deg, var(--color-canvas), color-mix(in srgb, var(--color-canvas) 88%, var(--color-primary-soft))); border-color: var(--color-hairline); text-decoration: none;"
 >
-  <!-- Icon -->
   <div class="flex items-center justify-between">
     <span
-      class="flex h-10 w-10 items-center justify-center rounded-lg"
-      style="background-color: var(--color-canvas-soft-2); color: var(--color-ink);"
+      class="category-card-icon flex h-10 w-10 items-center justify-center rounded-xl transition-colors duration-150"
+      style="background-color: var(--color-primary-soft); color: var(--color-primary);"
       aria-hidden="true"
     >
       <span set:html={getIcon(category.icon, 20)} />
     </span>
     <span
-      class="text-caption rounded-full px-2 py-0.5"
-      style="background-color: var(--color-canvas-soft-2); color: var(--color-mute);"
+      class="category-card-count text-caption rounded-full px-2.5 py-1"
+      style="background-color: var(--color-teal-soft); color: var(--color-teal);"
     >
       {toolCount} tools
     </span>
   </div>
 
-  <!-- Content -->
   <div>
     <h3
-      class="text-display-sm mb-1 transition-colors group-hover:text-[var(--color-link)]"
+      class="text-display-sm mb-1 transition-colors duration-150 group-hover:text-[var(--color-primary)]"
       style="color: var(--color-ink);"
     >
       {category.name}
@@ -45,30 +43,47 @@ const toolCount = category.tools.length;
     </p>
   </div>
 
-  <!-- CTA -->
-  <div class="flex items-center gap-1 text-sm font-medium mt-auto" style="color: var(--color-link);">
-    Browse tools
-    <span set:html={getIcon('arrow-right', 14)} />
+  <div class="category-card-cta flex items-center gap-1 text-sm font-medium mt-auto" style="color: var(--color-primary);">
+    Browse Tools
+    <span class="transition-transform duration-150 group-hover:translate-x-0.5" set:html={getIcon('arrow-right', 14)} />
   </div>
 </a>
 
 <style>
-  html.dark a {
-    background-color: var(--color-dark-canvas-soft) !important;
+  .category-card:hover {
+    border-color: var(--color-primary-soft-strong) !important;
+  }
+  .category-card:hover .category-card-icon {
+    background-color: var(--color-primary) !important;
+    color: #ffffff !important;
+  }
+  html.dark .category-card {
+    background: linear-gradient(180deg, var(--color-dark-canvas-soft), color-mix(in srgb, var(--color-dark-canvas-soft) 82%, var(--color-dark-primary-soft))) !important;
     border-color: var(--color-dark-hairline) !important;
   }
-  html.dark a span:first-child span {
-    background-color: var(--color-dark-canvas-soft-2) !important;
+  html.dark .category-card:hover {
+    border-color: var(--color-dark-hairline-strong) !important;
+  }
+  html.dark .category-card-icon {
+    background-color: var(--color-dark-primary-soft) !important;
+    color: var(--color-dark-primary) !important;
+  }
+  html.dark .category-card:hover .category-card-icon {
+    background-color: var(--color-dark-primary) !important;
+    color: var(--color-dark-canvas) !important;
+  }
+  html.dark .category-card h3 {
     color: var(--color-dark-ink) !important;
   }
-  html.dark a h3 {
-    color: var(--color-dark-ink) !important;
+  html.dark .category-card:hover h3,
+  html.dark .category-card-cta {
+    color: var(--color-dark-primary) !important;
   }
-  html.dark a p {
+  html.dark .category-card p {
     color: var(--color-dark-mute) !important;
   }
-  html.dark a .text-caption {
-    background-color: var(--color-dark-canvas-soft-2) !important;
-    color: var(--color-dark-mute) !important;
+  html.dark .category-card-count {
+    background-color: color-mix(in srgb, var(--color-dark-teal) 14%, var(--color-dark-canvas-soft-2)) !important;
+    color: var(--color-dark-teal) !important;
   }
 </style>

@@ -24,10 +24,10 @@ const schema = {
 };
 ---
 
-<nav aria-label="Breadcrumb" class="flex items-center gap-1.5 text-sm flex-wrap">
+<nav aria-label="Breadcrumb" class="breadcrumb flex items-center gap-1.5 text-sm flex-wrap">
   <a
     href="/"
-    class="flex items-center gap-1 transition-colors hover:opacity-80"
+    class="breadcrumb-link flex items-center gap-1 rounded-full px-1.5 py-1 transition-colors duration-150 hover:bg-[var(--color-primary-soft)] hover:text-[var(--color-primary)]"
     style="color: var(--color-mute);"
     aria-label="Home"
   >
@@ -36,19 +36,19 @@ const schema = {
 
   {items.map((item, i) => (
     <>
-      <span style="color: var(--color-hairline-strong);" aria-hidden="true">
+      <span class="breadcrumb-separator" style="color: var(--color-hairline-strong);" aria-hidden="true">
         <span set:html={getIcon('chevron-right', 12)} />
       </span>
       {item.href && i < items.length - 1 ? (
         <a
           href={item.href}
-          class="transition-colors hover:opacity-80"
+          class="breadcrumb-link rounded-full px-1.5 py-1 transition-colors duration-150 hover:bg-[var(--color-primary-soft)] hover:text-[var(--color-primary)]"
           style="color: var(--color-mute);"
         >
           {item.label}
         </a>
       ) : (
-        <span style="color: var(--color-body-text);" aria-current="page">
+        <span class="breadcrumb-current rounded-full px-1.5 py-1" style="color: var(--color-body-text);" aria-current="page">
           {item.label}
         </span>
       )}
@@ -59,11 +59,18 @@ const schema = {
 <script type="application/ld+json" set:html={JSON.stringify(schema)} />
 
 <style>
-  html.dark nav a,
-  html.dark nav span {
+  html.dark .breadcrumb-link {
     color: var(--color-dark-mute) !important;
   }
-  html.dark nav span[aria-current="page"] {
+  html.dark .breadcrumb-link:hover {
+    color: var(--color-dark-primary) !important;
+    background-color: var(--color-dark-primary-soft) !important;
+  }
+  html.dark .breadcrumb-separator {
+    color: var(--color-dark-hairline-strong) !important;
+  }
+  html.dark .breadcrumb-current {
     color: var(--color-dark-body) !important;
+    background-color: color-mix(in srgb, var(--color-dark-canvas-soft-2) 72%, transparent) !important;
   }
 </style>

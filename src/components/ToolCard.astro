@@ -13,37 +13,34 @@ const href = `/${tool.categorySlug}/${tool.slug}`;
 
 <a
   href={href}
-  class={`group flex items-start gap-3 rounded-lg border transition-all duration-150 hover:-translate-y-0.5 shadow-card hover:shadow-card-md ${size === 'sm' ? 'p-3' : 'p-4'}`}
+  class={`tool-card group flex items-start gap-3 rounded-xl border transition-[transform,box-shadow,border-color,background-color] duration-150 hover:-translate-y-0.5 shadow-card hover:shadow-card-md ${size === 'sm' ? 'p-3' : 'p-4'}`}
   style="background-color: var(--color-canvas); border-color: var(--color-hairline); text-decoration: none;"
 >
-  <!-- Icon -->
   <span
-    class={`flex shrink-0 items-center justify-center rounded-md ${size === 'sm' ? 'h-8 w-8' : 'h-9 w-9'}`}
-    style="background-color: var(--color-canvas-soft-2); color: var(--color-body-text);"
+    class={`tool-card-icon flex shrink-0 items-center justify-center rounded-lg transition-colors duration-150 ${size === 'sm' ? 'h-8 w-8' : 'h-9 w-9'}`}
+    style="background-color: var(--color-primary-soft); color: var(--color-primary);"
     aria-hidden="true"
   >
     <span set:html={getIcon(tool.icon, size === 'sm' ? 16 : 18)} />
   </span>
 
-  <!-- Content -->
   <div class="min-w-0 flex-1">
     <p
-      class={`font-medium leading-snug truncate transition-colors group-hover:text-[var(--color-link)] ${size === 'sm' ? 'text-sm' : 'text-sm'}`}
+      class={`font-medium leading-snug truncate transition-colors duration-150 group-hover:text-[var(--color-primary)] ${size === 'sm' ? 'text-sm' : 'text-sm'}`}
       style="color: var(--color-ink);"
     >
       {tool.name}
     </p>
     {size === 'md' && (
-      <p class="mt-0.5 text-xs leading-relaxed line-clamp-2" style="color: var(--color-mute);">
+      <p class="mt-1 text-xs leading-relaxed line-clamp-2" style="color: var(--color-mute);">
         {tool.description}
       </p>
     )}
   </div>
 
-  <!-- Arrow -->
   <span
-    class="shrink-0 opacity-0 group-hover:opacity-100 transition-opacity mt-0.5"
-    style="color: var(--color-mute);"
+    class="tool-card-arrow shrink-0 opacity-0 group-hover:opacity-100 transition-opacity duration-150 mt-0.5"
+    style="color: var(--color-primary);"
     aria-hidden="true"
   >
     <span set:html={getIcon('chevron-right', 14)} />
@@ -51,18 +48,40 @@ const href = `/${tool.categorySlug}/${tool.slug}`;
 </a>
 
 <style>
-  html.dark a[href] {
+  .tool-card:hover {
+    border-color: var(--color-primary-soft-strong) !important;
+    background-color: color-mix(in srgb, var(--color-canvas) 88%, var(--color-primary-soft)) !important;
+  }
+  .tool-card:hover .tool-card-icon {
+    background-color: var(--color-primary) !important;
+    color: #ffffff !important;
+  }
+  html.dark .tool-card {
     background-color: var(--color-dark-canvas-soft) !important;
     border-color: var(--color-dark-hairline) !important;
   }
-  html.dark a[href] p:first-child {
+  html.dark .tool-card:hover {
+    background-color: color-mix(in srgb, var(--color-dark-canvas-soft) 82%, var(--color-dark-primary-soft)) !important;
+    border-color: var(--color-dark-hairline-strong) !important;
+  }
+  html.dark .tool-card p:first-child {
     color: var(--color-dark-ink) !important;
   }
-  html.dark a[href] p:last-child {
+  html.dark .tool-card:hover p:first-child {
+    color: var(--color-dark-primary) !important;
+  }
+  html.dark .tool-card p:last-child {
     color: var(--color-dark-mute) !important;
   }
-  html.dark a[href] span:first-child {
-    background-color: var(--color-dark-canvas-soft-2) !important;
-    color: var(--color-dark-body) !important;
+  html.dark .tool-card-icon {
+    background-color: var(--color-dark-primary-soft) !important;
+    color: var(--color-dark-primary) !important;
+  }
+  html.dark .tool-card:hover .tool-card-icon {
+    background-color: var(--color-dark-primary) !important;
+    color: var(--color-dark-canvas) !important;
+  }
+  html.dark .tool-card-arrow {
+    color: var(--color-dark-primary) !important;
   }
 </style>
