@@ -56,13 +56,16 @@ const fullTitle = title.includes('ToolHub') ? title : `${title} | ToolHub`;
     <link rel="icon" href="/favicon.ico" />
     <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
 
-    <!-- Fonts: Inter as Geist substitute -->
+    <!-- Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link
-      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400&display=swap"
+      href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap"
       rel="stylesheet"
     />
+
+    <meta name="theme-color" content="#2563eb" media="(prefers-color-scheme: light)" />
+    <meta name="theme-color" content="#07111f" media="(prefers-color-scheme: dark)" />
 
     <!-- Structured Data -->
     {schema && (
@@ -94,7 +97,7 @@ const fullTitle = title.includes('ToolHub') ? title : `${title} | ToolHub`;
       })();
     </script>
   </head>
-  <body>
+  <body class="site-shell">
     <slot />
 
     <!-- Dark Mode Toggle Script -->

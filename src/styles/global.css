@@ -1,26 +1,31 @@
 @import "tailwindcss";
 
 @theme {
-  /* Colors */
+  /* Core palette */
   --color-primary: #2563eb;
   --color-primary-hover: #1d4ed8;
   --color-primary-deep: #1e40af;
-  --color-primary-soft: #eff6ff;
-  --color-primary-soft-strong: #dbeafe;
+  --color-primary-soft: #e0efff;
+  --color-primary-soft-strong: #c7ddff;
+  --color-teal: #0f9488;
+  --color-teal-soft: #e6fffb;
+  --color-sea-green: #059669;
+  --color-sea-green-soft: #dcfce7;
   --color-lavender: #8b5cf6;
-  --color-lavender-soft: #f5f3ff;
-  --color-teal: #14b8a6;
-  --color-teal-soft: #f0fdfa;
-  --color-sea-green: #10b981;
-  --color-sea-green-soft: #ecfdf5;
-  --color-ink: #111827;
-  --color-body-text: #4b5563;
-  --color-mute: #6b7280;
-  --color-hairline: #e2e8f0;
-  --color-hairline-strong: #94a3b8;
-  --color-canvas: #ffffff;
-  --color-canvas-soft: #f8fafc;
-  --color-canvas-soft-2: #f1f5f9;
+  --color-lavender-soft: #f3e8ff;
+
+  /* Surfaces */
+  --color-ink: #0f172a;
+  --color-body-text: #475569;
+  --color-mute: #64748b;
+  --color-hairline: #d7e1f1;
+  --color-hairline-strong: #9aa9c1;
+  --color-canvas: #f8fbff;
+  --color-canvas-soft: #eef5ff;
+  --color-canvas-soft-2: #e6effc;
+  --color-canvas-strong: #ffffff;
+
+  /* Semantics */
   --color-link: #2563eb;
   --color-link-deep: #1e40af;
   --color-link-bg-soft: #dbeafe;
@@ -29,31 +34,28 @@
   --color-error-soft: #fee2e2;
   --color-warning: #d97706;
   --color-warning-soft: #fef3c7;
-  --color-violet: #8b5cf6;
-  --color-cyan: #14b8a6;
-  --color-highlight-pink: #7c3aed;
 
-  /* Dark mode surface tokens */
+  /* Dark surfaces */
   --color-dark-primary: #60a5fa;
   --color-dark-primary-hover: #93c5fd;
-  --color-dark-primary-soft: #172554;
-  --color-dark-lavender: #c4b5fd;
+  --color-dark-primary-soft: #12335e;
   --color-dark-teal: #5eead4;
-  --color-dark-sea-green: #6ee7b7;
-  --color-dark-canvas: #08111f;
-  --color-dark-canvas-soft: #0f1b2d;
-  --color-dark-canvas-soft-2: #132238;
-  --color-dark-hairline: #24364f;
-  --color-dark-hairline-strong: #3b5576;
-  --color-dark-ink: #f8fafc;
-  --color-dark-body: #cbd5e1;
+  --color-dark-sea-green: #86efac;
+  --color-dark-lavender: #c4b5fd;
+  --color-dark-canvas: #07111f;
+  --color-dark-canvas-soft: #0e1a2f;
+  --color-dark-canvas-soft-2: #132542;
+  --color-dark-hairline: #233a5d;
+  --color-dark-hairline-strong: #395476;
+  --color-dark-ink: #f8fbff;
+  --color-dark-body: #c7d2e5;
   --color-dark-mute: #94a3b8;
 
   /* Typography */
-  --font-sans: Geist, Inter, system-ui, -apple-system, sans-serif;
-  --font-mono: "Geist Mono", ui-monospace, SFMono-Regular, Menlo, Monaco, monospace;
+  --font-sans: "Plus Jakarta Sans", Inter, system-ui, -apple-system, sans-serif;
+  --font-mono: "IBM Plex Mono", ui-monospace, SFMono-Regular, Menlo, Monaco, monospace;
 
-  /* Border Radius */
+  /* Radius */
   --radius-xs: 4px;
   --radius-sm: 6px;
   --radius-md: 8px;
@@ -64,7 +66,6 @@
   --radius-full: 9999px;
 }
 
-/* Base Reset */
 *, *::before, *::after {
   box-sizing: border-box;
 }
@@ -74,6 +75,7 @@ html {
   -webkit-text-size-adjust: 100%;
   color-scheme: light;
   scrollbar-color: var(--color-hairline-strong) transparent;
+  background: var(--color-canvas-soft);
 }
 
 body {
@@ -82,25 +84,33 @@ body {
   font-size: 16px;
   line-height: 24px;
   color: var(--color-ink);
-  background-color: var(--color-canvas-soft);
+  min-height: 100vh;
+  background:
+    radial-gradient(circle at top left, rgba(37, 99, 235, 0.12), transparent 34%),
+    radial-gradient(circle at top right, rgba(139, 92, 246, 0.10), transparent 30%),
+    radial-gradient(circle at 50% 110%, rgba(20, 184, 166, 0.08), transparent 38%),
+    linear-gradient(180deg, var(--color-canvas) 0%, var(--color-canvas-soft) 38%, #eef4ff 100%);
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   text-rendering: optimizeLegibility;
   transition: background-color 0.2s ease, color 0.2s ease;
 }
 
-/* Dark Mode */
 html.dark {
   color-scheme: dark;
   scrollbar-color: var(--color-dark-hairline-strong) transparent;
+  background: var(--color-dark-canvas);
 }
 
 html.dark body {
   color: var(--color-dark-ink);
-  background-color: var(--color-dark-canvas);
+  background:
+    radial-gradient(circle at top left, rgba(96, 165, 250, 0.16), transparent 32%),
+    radial-gradient(circle at top right, rgba(196, 181, 253, 0.14), transparent 28%),
+    radial-gradient(circle at 50% 110%, rgba(94, 234, 212, 0.10), transparent 36%),
+    linear-gradient(180deg, var(--color-dark-canvas) 0%, #091425 44%, #07111f 100%);
 }
 
-/* Selection */
 ::selection {
   background-color: var(--color-primary);
   color: #ffffff;
@@ -111,20 +121,18 @@ html.dark ::selection {
   color: var(--color-dark-canvas);
 }
 
-/* Focus Ring */
 :focus-visible {
-  outline: 3px solid color-mix(in srgb, var(--color-primary) 62%, transparent);
+  outline: 3px solid color-mix(in srgb, var(--color-primary) 58%, transparent);
   outline-offset: 3px;
   border-radius: var(--radius-sm);
   box-shadow: 0 0 0 6px color-mix(in srgb, var(--color-primary) 12%, transparent);
 }
 
 html.dark :focus-visible {
-  outline-color: color-mix(in srgb, var(--color-dark-primary) 72%, transparent);
-  box-shadow: 0 0 0 6px color-mix(in srgb, var(--color-dark-primary) 16%, transparent);
+  outline-color: color-mix(in srgb, var(--color-dark-primary) 68%, transparent);
+  box-shadow: 0 0 0 6px color-mix(in srgb, var(--color-dark-primary) 14%, transparent);
 }
 
-/* Scrollbar */
 ::-webkit-scrollbar { width: 6px; height: 6px; }
 ::-webkit-scrollbar-track { background: transparent; }
 ::-webkit-scrollbar-thumb {
@@ -140,74 +148,88 @@ html.dark ::-webkit-scrollbar-thumb:hover {
   background: var(--color-dark-body);
 }
 
-/* Card Elevation Shadows */
 .shadow-card {
   box-shadow:
     inset 0 0 0 1px rgba(37, 99, 235, 0.08),
-    0 1px 2px rgba(15, 23, 42, 0.04),
-    0 8px 24px rgba(37, 99, 235, 0.05);
+    0 1px 2px rgba(15, 23, 42, 0.05),
+    0 16px 30px rgba(37, 99, 235, 0.06);
 }
 
 .shadow-card-md {
   box-shadow:
     inset 0 0 0 1px rgba(37, 99, 235, 0.10),
-    0 2px 6px rgba(15, 23, 42, 0.05),
-    0 14px 36px rgba(37, 99, 235, 0.08);
+    0 2px 6px rgba(15, 23, 42, 0.06),
+    0 22px 42px rgba(20, 184, 166, 0.08);
 }
 
 .shadow-card-lg {
   box-shadow:
     inset 0 0 0 1px rgba(37, 99, 235, 0.12),
-    0 4px 12px rgba(15, 23, 42, 0.06),
-    0 24px 56px rgba(37, 99, 235, 0.10);
+    0 4px 12px rgba(15, 23, 42, 0.08),
+    0 28px 64px rgba(139, 92, 246, 0.10);
 }
 
 html.dark .shadow-card {
   box-shadow:
     inset 0 0 0 1px rgba(96, 165, 250, 0.14),
     0 1px 2px rgba(0, 0, 0, 0.28),
-    0 12px 28px rgba(2, 6, 23, 0.32);
+    0 16px 28px rgba(2, 6, 23, 0.36);
 }
 
 html.dark .shadow-card-md {
   box-shadow:
     inset 0 0 0 1px rgba(96, 165, 250, 0.18),
-    0 2px 8px rgba(0, 0, 0, 0.34),
-    0 18px 42px rgba(2, 6, 23, 0.40);
+    0 2px 8px rgba(0, 0, 0, 0.32),
+    0 22px 40px rgba(2, 6, 23, 0.44);
 }
 
 html.dark .shadow-card-lg {
   box-shadow:
     inset 0 0 0 1px rgba(96, 165, 250, 0.20),
-    0 4px 14px rgba(0, 0, 0, 0.38),
-    0 28px 64px rgba(2, 6, 23, 0.46);
+    0 4px 14px rgba(0, 0, 0, 0.36),
+    0 28px 60px rgba(2, 6, 23, 0.50);
 }
 
-/* Gradient Mesh */
 .gradient-mesh {
   background:
-    radial-gradient(ellipse 80% 58% at 18% 28%, rgba(37, 99, 235, 0.13) 0%, transparent 62%),
-    radial-gradient(ellipse 64% 48% at 82% 18%, rgba(139, 92, 246, 0.10) 0%, transparent 58%),
-    radial-gradient(ellipse 72% 54% at 74% 82%, rgba(20, 184, 166, 0.10) 0%, transparent 60%),
-    radial-gradient(ellipse 60% 44% at 35% 88%, rgba(16, 185, 129, 0.08) 0%, transparent 56%),
-    linear-gradient(180deg, rgba(255,255,255,0.78) 0%, rgba(248,250,252,0.96) 100%);
+    radial-gradient(ellipse 78% 58% at 12% 18%, rgba(37, 99, 235, 0.16) 0%, transparent 58%),
+    radial-gradient(ellipse 60% 46% at 84% 14%, rgba(139, 92, 246, 0.14) 0%, transparent 56%),
+    radial-gradient(ellipse 70% 52% at 74% 82%, rgba(20, 184, 166, 0.14) 0%, transparent 58%),
+    radial-gradient(ellipse 58% 44% at 32% 86%, rgba(5, 150, 105, 0.10) 0%, transparent 56%),
+    linear-gradient(180deg, rgba(248, 251, 255, 0.94) 0%, rgba(238, 245, 255, 0.98) 100%);
 }
 
 html.dark .gradient-mesh {
   background:
-    radial-gradient(ellipse 78% 54% at 18% 24%, rgba(96, 165, 250, 0.18) 0%, transparent 62%),
-    radial-gradient(ellipse 62% 48% at 84% 18%, rgba(196, 181, 253, 0.12) 0%, transparent 58%),
-    radial-gradient(ellipse 70% 54% at 72% 82%, rgba(94, 234, 212, 0.12) 0%, transparent 60%),
-    radial-gradient(ellipse 58% 44% at 32% 86%, rgba(110, 231, 183, 0.10) 0%, transparent 56%),
-    linear-gradient(180deg, rgba(8,17,31,0.92) 0%, rgba(15,27,45,0.98) 100%);
+    radial-gradient(ellipse 76% 54% at 12% 16%, rgba(96, 165, 250, 0.18) 0%, transparent 58%),
+    radial-gradient(ellipse 58% 46% at 84% 14%, rgba(196, 181, 253, 0.14) 0%, transparent 56%),
+    radial-gradient(ellipse 68% 52% at 74% 82%, rgba(94, 234, 212, 0.14) 0%, transparent 58%),
+    radial-gradient(ellipse 56% 42% at 30% 84%, rgba(110, 231, 183, 0.12) 0%, transparent 56%),
+    linear-gradient(180deg, rgba(7, 17, 31, 0.96) 0%, rgba(14, 26, 47, 0.98) 100%);
 }
 
-/* Typography Utilities */
+.surface-panel {
+  background:
+    linear-gradient(180deg, color-mix(in srgb, var(--color-canvas) 94%, var(--color-primary-soft)) 0%, var(--color-canvas) 100%);
+  border: 1px solid var(--color-hairline);
+  box-shadow: 0 1px 0 rgba(255, 255, 255, 0.7) inset, 0 12px 30px rgba(37, 99, 235, 0.05);
+}
+
+.surface-panel-muted {
+  background:
+    linear-gradient(180deg, color-mix(in srgb, var(--color-canvas-soft) 88%, var(--color-lavender-soft)) 0%, var(--color-canvas-soft) 100%);
+  border: 1px solid var(--color-hairline);
+}
+
+.surface-rail {
+  background: linear-gradient(90deg, var(--color-primary), var(--color-teal), var(--color-sea-green), var(--color-lavender));
+}
+
 .text-display-xl {
   font-size: 48px;
   font-weight: 600;
-  line-height: 48px;
-  letter-spacing: -1.6px;
+  line-height: 54px;
+  letter-spacing: -0.04em;
   text-wrap: balance;
 }
 
@@ -215,7 +237,7 @@ html.dark .gradient-mesh {
   font-size: 32px;
   font-weight: 600;
   line-height: 40px;
-  letter-spacing: -0.8px;
+  letter-spacing: -0.03em;
   text-wrap: balance;
 }
 
@@ -223,7 +245,7 @@ html.dark .gradient-mesh {
   font-size: 24px;
   font-weight: 600;
   line-height: 32px;
-  letter-spacing: -0.48px;
+  letter-spacing: -0.02em;
   text-wrap: balance;
 }
 
@@ -231,7 +253,7 @@ html.dark .gradient-mesh {
   font-size: 20px;
   font-weight: 600;
   line-height: 28px;
-  letter-spacing: -0.24px;
+  letter-spacing: -0.02em;
   text-wrap: balance;
 }
 
@@ -267,13 +289,13 @@ html.dark .gradient-mesh {
 @media (max-width: 600px) {
   .text-display-xl {
     font-size: 32px;
-    line-height: 36px;
-    letter-spacing: -0.8px;
+    line-height: 38px;
+    letter-spacing: -0.03em;
   }
 
   .text-display-lg {
     font-size: 24px;
     line-height: 30px;
-    letter-spacing: -0.48px;
+    letter-spacing: -0.025em;
   }
 }
